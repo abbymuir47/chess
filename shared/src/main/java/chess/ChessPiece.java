@@ -49,5 +49,6 @@ public class ChessPiece {
      */
     public Collection<ChessMove> pieceMoves(ChessBoard board, ChessPosition myPosition) {
         return new ArrayList<>();
+        //implement KingMovesCalculator,... classes using a switch statement in the ChessPiece class
     }
 }

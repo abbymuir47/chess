@@ -8,15 +8,24 @@ package chess;
  */
 public class ChessMove {
 
+    //do i need to initialize these here?
+    private ChessPosition startPosition;
+    private ChessPosition endPosition;
+    private ChessPiece.PieceType promotionPiece;
+
     public ChessMove(ChessPosition startPosition, ChessPosition endPosition,
                      ChessPiece.PieceType promotionPiece) {
+        //i feel like this is redundant
+        //start = new ChessPosition(startPosition.getRow(), startPosition.getColumn());
+        //startPosition = startPosition;
     }
 
     /**
      * @return ChessPosition of starting location
      */
     public ChessPosition getStartPosition() {
-        throw new RuntimeException("Not implemented");
+        //throw new RuntimeException("Not implemented");
+        return startPosition;
     }
 
     /**
