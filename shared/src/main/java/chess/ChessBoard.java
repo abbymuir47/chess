@@ -1,5 +1,8 @@
 package chess;
 
+import static chess.ChessGame.TeamColor.*;
+import static chess.ChessPiece.PieceType.*;
+
 /**
  * A chessboard that can hold and rearrange chess pieces.
  * <p>
@@ -8,8 +11,8 @@ package chess;
  */
 public class ChessBoard {
     private ChessPiece[][] squares = new ChessPiece[8][8];
+
     public ChessBoard() {
-        
     }
 
     /**
@@ -18,8 +21,9 @@ public class ChessBoard {
      * @param position where to add the piece to
      * @param piece    the piece to add
      */
+    //might use this function when moving a piece, add the piece to its new position
     public void addPiece(ChessPosition position, ChessPiece piece) {
-        squares[position.getRow()][position.getColumn()] = piece;
+        squares[position.getRow()-1][position.getColumn()-1] = piece;
     }
 
     /**
@@ -30,7 +34,7 @@ public class ChessBoard {
      * position
      */
     public ChessPiece getPiece(ChessPosition position) {
-        return squares[position.getRow()][position.getColumn()];
+        return squares[position.getRow()-1][position.getColumn()-1];
     }
 
     /**
@@ -38,6 +42,32 @@ public class ChessBoard {
      * (How the game of chess normally starts)
      */
     public void resetBoard() {
-        throw new RuntimeException("Not implemented");
+        squares = new ChessPiece[8][8];
+
+        //setup white pieces
+        squares[0][0] = new ChessPiece(WHITE, ROOK);
+        squares[0][1] = new ChessPiece(WHITE, KNIGHT);
+        squares[0][2] = new ChessPiece(WHITE, BISHOP);
+        squares[0][3] = new ChessPiece(WHITE, QUEEN);
+        squares[0][4] = new ChessPiece(WHITE, KING);
+        squares[0][5] = new ChessPiece(WHITE, BISHOP);
+        squares[0][6] = new ChessPiece(WHITE, KNIGHT);
+        squares[0][7] = new ChessPiece(WHITE, ROOK);
+        for (int i = 0; i < 8; i++){
+            squares[1][i] = new ChessPiece(WHITE, PAWN);
+        }
+
+        //setup black pieces
+        for (int i = 0; i < 8; i++){
+            squares[6][i] = new ChessPiece(BLACK, PAWN);
+        }
+        squares[7][0] = new ChessPiece(BLACK, ROOK);
+        squares[7][1] = new ChessPiece(BLACK, KNIGHT);
+        squares[7][2] = new ChessPiece(BLACK, BISHOP);
+        squares[7][3] = new ChessPiece(BLACK, QUEEN);
+        squares[7][4] = new ChessPiece(BLACK, KING);
+        squares[7][5] = new ChessPiece(BLACK, BISHOP);
+        squares[7][6] = new ChessPiece(BLACK, KNIGHT);
+        squares[7][7] = new ChessPiece(BLACK, ROOK);
     }
 }
