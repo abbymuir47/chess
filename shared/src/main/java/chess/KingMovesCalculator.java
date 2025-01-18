@@ -15,6 +15,17 @@ public class KingMovesCalculator implements PieceMovesCalculator{
         int row = position.getRow();
         int col = position.getColumn();
 
+        /*
+        [0][1]
+        [0][-1]
+        [1][0]
+        [-1][0]
+        [1][1]
+        [1][-1]
+        [-1][1]
+        [-1][-1]
+        */
+
         //defines my current piece and gets its color
         ChessPiece myPiece = board.getPiece(position);
         ChessGame.TeamColor pieceColor = myPiece.getTeamColor();

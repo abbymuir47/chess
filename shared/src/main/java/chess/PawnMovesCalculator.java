@@ -33,6 +33,7 @@ public class PawnMovesCalculator implements PieceMovesCalculator{
             attackTwo = new ChessPosition(row+1, col-1);
         }
 
+        //need to add code that makes sure the move isn't out of bounds of the board
         ChessPiece checkPiece = board.getPiece(forwardMove);
         if(checkPiece != null){
             moves.add(new ChessMove(position, forwardMove,PAWN));
