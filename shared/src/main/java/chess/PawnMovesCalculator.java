@@ -18,17 +18,42 @@ public class PawnMovesCalculator implements PieceMovesCalculator{
         ChessPiece myPiece = board.getPiece(position);
         ChessGame.TeamColor pieceColor = myPiece.getTeamColor();
 
-        ChessPosition endPosition;
+        //get coordinates for moving one square forward or attacking one square diagonally
+        ChessPosition forwardMove;
+        ChessPosition attackOne;
+        ChessPosition attackTwo;
+
         if(pieceColor == BLACK){
-            endPosition = new ChessPosition(row-1,col);
+            forwardMove = new ChessPosition(row-1,col);
+            attackOne = new ChessPosition(row-1, col+1);
+            attackTwo = new ChessPosition(row-1, col-1);
         } else { //if the color is white
-            endPosition = new ChessPosition(row+1,col);
+            forwardMove = new ChessPosition(row+1,col);
+            attackOne = new ChessPosition(row+1, col+1);
+            attackTwo = new ChessPosition(row+1, col-1);
         }
 
-        ChessPiece checkPiece = board.getPiece(endPosition);
+        ChessPiece checkPiece = board.getPiece(forwardMove);
         if(checkPiece != null){
-            moves.add(new ChessMove(position, endPosition,PAWN));
+            moves.add(new ChessMove(position, forwardMove,PAWN));
         }
+
+        ChessPiece checkAttackOne = board.getPiece(attackOne);
+        if(checkAttackOne != null){
+            ChessGame.TeamColor attackSquareColor = checkAttackOne.getTeamColor();
+            if(attackSquareColor != pieceColor){
+                moves.add(new ChessMove(position, attackOne,PAWN));
+            }
+        }
+
+        ChessPiece checkAttackTwo = board.getPiece(attackTwo);
+        if(checkAttackTwo != null){
+            ChessGame.TeamColor attackSquareColor = checkAttackTwo.getTeamColor();
+            if(attackSquareColor != pieceColor){
+                moves.add(new ChessMove(position, attackTwo,PAWN));
+            }
+        }
+
         return moves;
     }
 }
