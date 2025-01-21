@@ -54,10 +54,21 @@ public class ChessPiece {
     public Collection<ChessMove> pieceMoves(ChessBoard board, ChessPosition myPosition) {
         //return new ArrayList<>();
         //implement KingMovesCalculator,... classes using a switch statement in the ChessPiece class
+        PieceMovesCalculator moves = switch(getPieceType()){
+            case PAWN -> new PawnMovesCalculator();
+            case ROOK -> new RookMovesCalculator();
+            case KNIGHT -> new KnightMovesCalculator();
+            case BISHOP -> new BishopMovesCalculator();
+            case KING -> new KingMovesCalculator();
+            case QUEEN -> new QueenMovesCalculator();
+        };
+        return moves.pieceMoves(board, myPosition);
+    }
+}
 
-        ChessPiece piece = board.getPiece(myPosition);
+/*
+ ChessPiece piece = board.getPiece(myPosition);
         type = piece.getPieceType();
-
         switch (type) {
             case PAWN:
                 PawnMovesCalculator pawnMoves = new PawnMovesCalculator();
@@ -80,5 +91,4 @@ public class ChessPiece {
             default:
                 throw new IllegalArgumentException();
         }
-    }
-}
+ */
