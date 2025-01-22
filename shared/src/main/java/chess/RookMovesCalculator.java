@@ -23,7 +23,7 @@ public class RookMovesCalculator implements PieceMovesCalculator{
 
         for (int i=0; i<combinations.length; i++){
             int newRow = row + combinations[i][0];
-            int newCol = col + combinations[0][i];
+            int newCol = col + combinations[i][1];
 
             while(newRow>=1 && newRow<=8 && newCol>=1 && newCol<=8){
                 ChessPosition newPos = new ChessPosition(newRow, newCol);
@@ -40,8 +40,8 @@ public class RookMovesCalculator implements PieceMovesCalculator{
                     }
                     break;
                 }
-                newRow = newRow + combinations[i][0];
-                newCol = newCol + combinations[0][i];
+                newRow += combinations[i][0];
+                newCol += combinations[i][1];
             }
         }
 
