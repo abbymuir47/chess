@@ -44,11 +44,6 @@ public class RookMovesCalculator implements PieceMovesCalculator{
                 newCol += combinations[i][1];
             }
         }
-
-
-
-
-
         return moves;
     }
 }
