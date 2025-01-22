@@ -33,21 +33,21 @@ public class KingMovesCalculator implements PieceMovesCalculator{
         for (int i = 0; i < combinations.length; i++) {
             int newRow = row + combinations[i][0];
             int newCol = col + combinations[i][1];
-            ChessPosition currMove = new ChessPosition(newRow, newCol);
+            ChessPosition newPos = new ChessPosition(newRow, newCol);
 
             if(newRow<1 | newRow>8 | newCol<1 | newCol>8){
                 continue;
             }
             else{
-                ChessPiece newPos = board.getPiece(currMove);
-                if(newPos != null){
-                    ChessGame.TeamColor newSquareColor = newPos.getTeamColor();
-                    if(newSquareColor != pieceColor){
-                        moves.add(new ChessMove(position, currMove, null));
+                ChessPiece newPiece = board.getPiece(newPos);
+                if(newPiece != null){
+                    ChessGame.TeamColor newPieceColor = newPiece.getTeamColor();
+                    if(newPieceColor != pieceColor){
+                        moves.add(new ChessMove(position, newPos, null));
                     }
                 }
                 else{
-                    moves.add(new ChessMove(position, currMove, null));
+                    moves.add(new ChessMove(position, newPos, null));
                 }
             }
         }
