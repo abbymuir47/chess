@@ -20,132 +20,74 @@ public class PawnMovesCalculator implements PieceMovesCalculator{
 
         //code for moving black pawns
         if(myColor == BLACK){
-            ChessPosition forwardMove = new ChessPosition(row-1,col);
-            ChessPosition attackRight = new ChessPosition(row-1,col+1);
-            ChessPosition attackLeft = new ChessPosition(row-1,col-1);
-
-            if (row > 2) {
-                //moves forward 1 space
-                if(board.getPiece(forwardMove) == null){
-                    moves.add(new ChessMove(position, forwardMove, null));
-                    //checks if the piece is at its starting position and can move forward 2 spaces
-                    if (row == 7) {
-                        ChessPosition moveTwo = new ChessPosition(row - 2, col);
-                        if (board.getPiece(moveTwo) == null) {
-                            moves.add(new ChessMove(position, moveTwo, null));
-                        }
-                    }
-                }
-                //checks if piece can capture a piece diagonally to the right
-                if(col<8){
-                    ChessPiece newPiece = board.getPiece(attackRight);
-                    if(newPiece != null && newPiece.getTeamColor() == WHITE){
-                        moves.add(new ChessMove(position, attackRight, null));
-                    }
-                }
-                //checks if piece can capture a piece diagonally to the left
-                if(col>1){
-                    ChessPiece newPiece = board.getPiece(attackLeft);
-                    if(newPiece != null && newPiece.getTeamColor() == WHITE){
-                        moves.add(new ChessMove(position, attackLeft, null));
-                    }
-                }
-            }
-            //checks for promotion
-            else if (row == 2){
-                //moves forward 1 space
-                if(board.getPiece(forwardMove) == null){
-                    moves.add(new ChessMove(position, forwardMove, ROOK));
-                    moves.add(new ChessMove(position, forwardMove, BISHOP));
-                    moves.add(new ChessMove(position, forwardMove, KNIGHT));
-                    moves.add(new ChessMove(position, forwardMove, QUEEN));
-                }
-                //checks if piece can capture a piece diagonally to the right
-                if(col < 8){
-                    ChessPiece newPiece = board.getPiece(attackRight);
-                    if(newPiece != null && newPiece.getTeamColor() == WHITE){
-                        moves.add(new ChessMove(position, attackRight, ROOK));
-                        moves.add(new ChessMove(position, attackRight, BISHOP));
-                        moves.add(new ChessMove(position, attackRight, KNIGHT));
-                        moves.add(new ChessMove(position, attackRight, QUEEN));
-                    }
-                }
-                //checks if piece can capture a piece diagonally to the left
-                if(col > 1){
-                    ChessPiece newPiece = board.getPiece(attackLeft);
-                    if(newPiece != null && newPiece.getTeamColor() == WHITE){
-                        moves.add(new ChessMove(position, attackLeft, ROOK));
-                        moves.add(new ChessMove(position, attackLeft, BISHOP));
-                        moves.add(new ChessMove(position, attackLeft, KNIGHT));
-                        moves.add(new ChessMove(position, attackLeft, QUEEN));
-                    }
-                }
-            }
+            validateMoves(board, position, row, col, moves, myColor, -1, 7, 2);
         }
         //code for moving white pawns
         else if(myColor == WHITE){
-            ChessPosition forwardMove = new ChessPosition(row+1,col);
-            ChessPosition attackRight = new ChessPosition(row+1,col+1);
-            ChessPosition attackLeft = new ChessPosition(row+1,col-1);
+            validateMoves(board, position, row, col, moves, myColor, 1, 2, 7);
+        }
+        return moves;
+    }
 
-            if (row < 7) {
-                //moves forward 1 space
-                if(board.getPiece(forwardMove) == null){
-                    moves.add(new ChessMove(position, forwardMove, null));
-                    //checks if the piece is at its starting position and can move forward 2 spaces
-                    if (row == 2) {
-                        ChessPosition moveTwo = new ChessPosition(row + 2, col);
-                        if (board.getPiece(moveTwo) == null) {
-                            moves.add(new ChessMove(position, moveTwo, null));
-                        }
-                    }
-                }
-                //checks if piece can capture a piece diagonally to the right
-                if(col<8){
-                    ChessPiece newPiece = board.getPiece(attackRight);
-                    if(newPiece != null && newPiece.getTeamColor() == BLACK){
-                        moves.add(new ChessMove(position, attackRight, null));
-                    }
-                }
-                //checks if piece can capture a piece diagonally to the left
-                if(col>1){
-                    ChessPiece newPiece = board.getPiece(attackLeft);
-                    if(newPiece != null && newPiece.getTeamColor() == BLACK){
-                        moves.add(new ChessMove(position, attackLeft, null));
+    private static void validateMoves(ChessBoard board, ChessPosition position, int row, int col, Collection<ChessMove> moves, ChessGame.TeamColor myColor, int forward, int startRow, int endRow) {
+        ChessPosition forwardMove = new ChessPosition(row + forward, col);
+        ChessPosition attackRight = new ChessPosition(row + forward, col +1);
+        ChessPosition attackLeft = new ChessPosition(row + forward, col -1);
+
+        if (row != endRow) {
+            //moves forward 1 space
+            if(board.getPiece(forwardMove) == null){
+                moves.add(new ChessMove(position, forwardMove, null));
+                //checks if the piece is at its starting position and can move forward 2 spaces
+                if (row == startRow) {
+                    ChessPosition moveTwo = new ChessPosition(row + (2*forward), col);
+                    if (board.getPiece(moveTwo) == null) {
+                        moves.add(new ChessMove(position, moveTwo, null));
                     }
                 }
             }
-            //checks for promotion
-            else if (row == 7){
-                //moves forward 1 space
-                if(board.getPiece(forwardMove) == null){
-                    moves.add(new ChessMove(position, forwardMove, ROOK));
-                    moves.add(new ChessMove(position, forwardMove, BISHOP));
-                    moves.add(new ChessMove(position, forwardMove, KNIGHT));
-                    moves.add(new ChessMove(position, forwardMove, QUEEN));
+            //checks if piece can capture a piece diagonally to the right
+            if(col <8){
+                ChessPiece newPiece = board.getPiece(attackRight);
+                if(newPiece != null && newPiece.getTeamColor() != myColor){
+                    moves.add(new ChessMove(position, attackRight, null));
                 }
-                //checks if piece can capture a piece diagonally to the right
-                if(col < 8){
-                    ChessPiece newPiece = board.getPiece(attackRight);
-                    if(newPiece != null && newPiece.getTeamColor() == BLACK){
-                        moves.add(new ChessMove(position, attackRight, ROOK));
-                        moves.add(new ChessMove(position, attackRight, BISHOP));
-                        moves.add(new ChessMove(position, attackRight, KNIGHT));
-                        moves.add(new ChessMove(position, attackRight, QUEEN));
-                    }
-                }
-                //checks if piece can capture a piece diagonally to the left
-                if(col > 1){
-                    ChessPiece newPiece = board.getPiece(attackLeft);
-                    if(newPiece != null && newPiece.getTeamColor() == BLACK){
-                        moves.add(new ChessMove(position, attackLeft, ROOK));
-                        moves.add(new ChessMove(position, attackLeft, BISHOP));
-                        moves.add(new ChessMove(position, attackLeft, KNIGHT));
-                        moves.add(new ChessMove(position, attackLeft, QUEEN));
-                    }
+            }
+            //checks if piece can capture a piece diagonally to the left
+            if(col >1){
+                ChessPiece newPiece = board.getPiece(attackLeft);
+                if(newPiece != null && newPiece.getTeamColor() != myColor){
+                    moves.add(new ChessMove(position, attackLeft, null));
                 }
             }
         }
-        return moves;
+        //checks for promotion
+        else if (row == endRow){
+            //moves forward 1 space
+            if(board.getPiece(forwardMove) == null){
+                promote(position, moves, forwardMove);
+            }
+            //checks if piece can capture a piece diagonally to the right
+            if(col < 8){
+                ChessPiece newPiece = board.getPiece(attackRight);
+                if(newPiece != null && newPiece.getTeamColor() != myColor){
+                    promote(position, moves, attackRight);
+                }
+            }
+            //checks if piece can capture a piece diagonally to the left
+            if(col > 1){
+                ChessPiece newPiece = board.getPiece(attackLeft);
+                if(newPiece != null && newPiece.getTeamColor() != myColor){
+                    promote(position, moves, attackLeft);
+                }
+            }
+        }
+    }
+
+    private static void promote(ChessPosition position, Collection<ChessMove> moves, ChessPosition move) {
+        moves.add(new ChessMove(position, move, ROOK));
+        moves.add(new ChessMove(position, move, BISHOP));
+        moves.add(new ChessMove(position, move, KNIGHT));
+        moves.add(new ChessMove(position, move, QUEEN));
     }
 }
