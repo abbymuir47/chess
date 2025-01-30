@@ -10,6 +10,9 @@ import java.util.Collection;
  */
 public class ChessGame {
 
+    ChessBoard board = new ChessBoard();
+    board.resetBoard();
+
     public ChessGame() {
 
     }
@@ -45,8 +48,19 @@ public class ChessGame {
      * @return Set of valid moves for requested piece, or null if no piece at
      * startPosition
      */
-    public Collection<ChessMove> validMoves(ChessPosition startPosition) {
+    /**Takes as input a position on the chessboard and returns all moves the piece there can legally make.
+     * If there is no piece at that location, this method returns null.
+     * A move is valid if it is a "piece move" for the piece at the input location and
+     * making that move would not leave the team’s king in danger of check.
+    */
+     public Collection<ChessMove> validMoves(ChessPosition startPosition) {
         throw new RuntimeException("Not implemented");
+        /*
+        if(board.getPiece(startPosition)==null){
+            return null;
+        }
+        else{}
+         */
     }
 
     /**
@@ -54,6 +68,10 @@ public class ChessGame {
      *
      * @param move chess move to preform
      * @throws InvalidMoveException if move is invalid
+     * Receives a given move and executes it, provided it is a legal move.
+     * If the move is illegal, it throws an InvalidMoveException.
+     * A move is illegal if it is not a "valid" move for the piece at the starting location,
+     * or if it’s not the corresponding team's turn.
      */
     public void makeMove(ChessMove move) throws InvalidMoveException {
         throw new RuntimeException("Not implemented");
@@ -64,6 +82,7 @@ public class ChessGame {
      *
      * @param teamColor which team to check for check
      * @return True if the specified team is in check
+     * Returns true if the specified team’s King could be captured by an opposing piece.
      */
     public boolean isInCheck(TeamColor teamColor) {
         throw new RuntimeException("Not implemented");
@@ -74,6 +93,7 @@ public class ChessGame {
      *
      * @param teamColor which team to check for checkmate
      * @return True if the specified team is in checkmate
+     * Returns true if the given team has no way to protect their king from being captured
      */
     public boolean isInCheckmate(TeamColor teamColor) {
         throw new RuntimeException("Not implemented");
@@ -85,6 +105,8 @@ public class ChessGame {
      *
      * @param teamColor which team to check for stalemate
      * @return True if the specified team is in stalemate, otherwise false
+     * Returns true if the given team has no legal moves but their king is not in immediate danger.
+     * can't make any moves that wouldn't put your king in check
      */
     public boolean isInStalemate(TeamColor teamColor) {
         throw new RuntimeException("Not implemented");

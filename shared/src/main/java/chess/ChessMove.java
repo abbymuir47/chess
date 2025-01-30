@@ -10,7 +10,6 @@ import java.util.Objects;
  */
 public class ChessMove {
 
-    //do i need to initialize these here?
     private final ChessPosition startPosition;
     private final ChessPosition endPosition;
     private final ChessPiece.PieceType promotionPiece;
