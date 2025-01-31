@@ -10,8 +10,9 @@ import java.util.Collection;
  */
 public class ChessGame {
 
-    ChessBoard board = new ChessBoard();
+    /*ChessBoard board = new ChessBoard();
     board.resetBoard();
+    */
 
     public ChessGame() {
 

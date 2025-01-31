@@ -11,8 +11,6 @@ public class PawnMovesCalculator implements PieceMovesCalculator{
     @Override
     public Collection<ChessMove> pieceMoves(ChessBoard board, ChessPosition position) {
         Collection<ChessMove> moves = new ArrayList<>();
-        int row = position.getRow();
-        int col = position.getColumn();
 
         //defines my current piece and gets its color
         ChessPiece myPiece = board.getPiece(position);
@@ -20,65 +18,58 @@ public class PawnMovesCalculator implements PieceMovesCalculator{
 
         //code for moving black pawns
         if(myColor == BLACK){
-            validateMoves(board, position, row, col, moves, myColor, -1, 7, 2);
+            validateMoves(board, position, moves, myColor, -1, 7, 2);
         }
         //code for moving white pawns
         else if(myColor == WHITE){
-            validateMoves(board, position, row, col, moves, myColor, 1, 2, 7);
+            validateMoves(board, position, moves, myColor, 1, 2, 7);
         }
         return moves;
     }
 
-    private static void validateMoves(ChessBoard board, ChessPosition position, int row, int col, Collection<ChessMove> moves, ChessGame.TeamColor myColor, int forward, int startRow, int endRow) {
+    private static void validateMoves(ChessBoard board, ChessPosition position, Collection<ChessMove> moves, ChessGame.TeamColor myColor, int forward, int startRow, int endRow) {
+        int row = position.getRow();
+        int col = position.getColumn();
+
         ChessPosition forwardMove = new ChessPosition(row + forward, col);
         ChessPosition attackRight = new ChessPosition(row + forward, col +1);
         ChessPosition attackLeft = new ChessPosition(row + forward, col -1);
 
-        if (row != endRow) {
-            //moves forward 1 space
-            if(board.getPiece(forwardMove) == null){
+        //checks ability to move forward
+        checkForward(board, position, moves, forward, startRow, endRow, forwardMove, row, col);
+        //checks if piece can capture a piece diagonally to the right
+        checkAttack(col < 8, board, attackRight, myColor, moves, position, endRow);
+        //checks if piece can capture a piece diagonally to the left
+        checkAttack(col > 1, board, attackLeft, myColor, moves, position, endRow);
+    }
+
+    private static void checkForward(ChessBoard board, ChessPosition position, Collection<ChessMove> moves, int forward, int startRow, int endRow, ChessPosition forwardMove, int row, int col) {
+        if(board.getPiece(forwardMove) == null){
+            if (row == endRow){
+                promote(position, moves, forwardMove);
+            }
+            else{
                 moves.add(new ChessMove(position, forwardMove, null));
                 //checks if the piece is at its starting position and can move forward 2 spaces
                 if (row == startRow) {
-                    ChessPosition moveTwo = new ChessPosition(row + (2*forward), col);
+                    ChessPosition moveTwo = new ChessPosition(row + (2* forward), col);
                     if (board.getPiece(moveTwo) == null) {
                         moves.add(new ChessMove(position, moveTwo, null));
                     }
                 }
             }
-            //checks if piece can capture a piece diagonally to the right
-            if(col <8){
-                ChessPiece newPiece = board.getPiece(attackRight);
-                if(newPiece != null && newPiece.getTeamColor() != myColor){
-                    moves.add(new ChessMove(position, attackRight, null));
-                }
-            }
-            //checks if piece can capture a piece diagonally to the left
-            if(col >1){
-                ChessPiece newPiece = board.getPiece(attackLeft);
-                if(newPiece != null && newPiece.getTeamColor() != myColor){
-                    moves.add(new ChessMove(position, attackLeft, null));
-                }
-            }
         }
-        //checks for promotion
-        else if (row == endRow){
-            //moves forward 1 space
-            if(board.getPiece(forwardMove) == null){
-                promote(position, moves, forwardMove);
-            }
-            //checks if piece can capture a piece diagonally to the right
-            if(col < 8){
-                ChessPiece newPiece = board.getPiece(attackRight);
-                if(newPiece != null && newPiece.getTeamColor() != myColor){
-                    promote(position, moves, attackRight);
+    }
+
+    private static void checkAttack(boolean col, ChessBoard board, ChessPosition newPos, ChessGame.TeamColor myColor, Collection<ChessMove> moves, ChessPosition position, int endRow) {
+        if (col) {
+            ChessPiece newPiece = board.getPiece(newPos);
+            if (newPiece != null && newPiece.getTeamColor() != myColor) {
+                if(position.getRow() != endRow) {
+                    moves.add(new ChessMove(position, newPos, null));
                 }
-            }
-            //checks if piece can capture a piece diagonally to the left
-            if(col > 1){
-                ChessPiece newPiece = board.getPiece(attackLeft);
-                if(newPiece != null && newPiece.getTeamColor() != myColor){
-                    promote(position, moves, attackLeft);
+                else{
+                    promote(position, moves, newPos);
                 }
             }
         }
