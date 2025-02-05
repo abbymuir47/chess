@@ -1,6 +1,9 @@
 package chess;
 
 import java.util.Collection;
+import java.util.Objects;
+
+import static chess.ChessPiece.PieceType.KING;
 
 /**
  * For a class that can manage a chess game, making moves on a board
@@ -15,6 +18,8 @@ public class ChessGame {
 
     public ChessGame() {
         board = new ChessBoard();
+        board.resetBoard();
+        team = TeamColor.WHITE;
     }
 
     /**
@@ -85,7 +90,92 @@ public class ChessGame {
      * Returns true if the specified team’s King could be captured by an opposing piece.
      */
     public boolean isInCheck(TeamColor teamColor) {
-        throw new RuntimeException("Not implemented");
+        ChessPosition kingPosition;
+        kingPosition = getKingPosition(teamColor);
+        int row = kingPosition.getRow();
+        int col = kingPosition.getColumn();
+
+        if (checkKnightAttack(teamColor, row, col)){
+            return true;
+        }
+        if (checkKingAttack(teamColor, row, col)){
+            return true;
+        }
+        return false;
+
+        //throw new RuntimeException("Not implemented");
+    }
+
+    private boolean checkKnightAttack(TeamColor teamColor, int row, int col){
+        int[][] combinations = {
+                {1,2},
+                {1,-2},
+                {-1,2},
+                {-1,-2},
+                {2,1},
+                {2,-1},
+                {-2,1},
+                {-2,-1}
+        };
+        return checkPotentialAttack(teamColor, combinations, row, col);
+    }
+
+    private boolean checkKingAttack(TeamColor teamColor, int row, int col){
+        int[][] combinations = {
+                {0,1},
+                {0,-1},
+                {1,0},
+                {-1,0},
+                {1,1},
+                {1,-1},
+                {-1,1},
+                {-1,-1}
+        };
+        return checkPotentialAttack(teamColor, combinations, row, col);
+    }
+
+
+    private boolean checkPotentialAttack(TeamColor teamColor, int[][] combinations, int row, int col) {
+        for (int i = 0; i < combinations.length; i++) {
+            int newRow = row + combinations[i][0];
+            int newCol = col + combinations[i][1];
+            ChessPosition newPos = new ChessPosition(newRow, newCol);
+            ChessPiece newPiece;
+
+            if(newRow<1 | newRow>8 | newCol<1 | newCol>8){
+                continue;
+            }
+            else{
+                newPiece = board.getPiece(newPos);
+                if(newPiece != null){
+                    TeamColor newPieceColor = newPiece.getTeamColor();
+                    if(newPieceColor != teamColor){
+                        return true;
+                    }
+                }
+                else{
+                    continue;
+                }
+            }
+        }
+        return false;
+    }
+
+    private ChessPosition getKingPosition(TeamColor teamColor) {
+        ChessPosition currPos;
+        ChessPiece currPiece;
+        for(int i = 1; i<9; i++){
+            for(int j=1;j<9;j++){
+                currPos = new ChessPosition(i,j);
+                currPiece = board.getPiece(currPos);
+                if (currPiece != null && currPiece.getTeamColor() == teamColor){
+                    if(currPiece.getPieceType() == KING){
+                        return currPos;
+                    }
+                }
+            }
+        }
+        return null;
     }
 
     /**
@@ -128,5 +218,27 @@ public class ChessGame {
      */
     public ChessBoard getBoard() {
         return board;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+        ChessGame chessGame = (ChessGame) o;
+        return Objects.equals(board, chessGame.board) && team == chessGame.team;
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(board, team);
+    }
+
+    @Override
+    public String toString() {
+        return "ChessGame{" +
+                "board=" + board +
+                ", team=" + team +
+                '}';
     }
 }
