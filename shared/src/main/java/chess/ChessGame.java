@@ -116,7 +116,7 @@ public class ChessGame {
 
     private boolean checkPawnAttack(TeamColor teamColor, int newRow, int col) {
         for(int i=-1; i<2; i+=2){
-            if(col+i >0 && col+1 <9){
+            if(col+i >0 && col+i <9){
                 ChessPosition attack = new ChessPosition(newRow, col +i);
                 ChessPiece attackPiece = board.getPiece(attack);
                 if(attackPiece != null){
@@ -181,6 +181,9 @@ public class ChessGame {
                     ChessGame.TeamColor newPieceColor = newPiece.getTeamColor();
                     if(newPieceColor != teamColor){
                         return true;
+                    }
+                    else{
+                        break;
                     }
                 }
                 else{
