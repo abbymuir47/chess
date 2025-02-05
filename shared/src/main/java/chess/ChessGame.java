@@ -95,90 +95,48 @@ public class ChessGame {
         int row = kingPosition.getRow();
         int col = kingPosition.getColumn();
 
-        if (checkKnightAttack(teamColor, row, col)){
+        if (checkJumpAttack(teamColor, row, col)){
             return true;
         }
-        if (checkKingAttack(teamColor, row, col)){
+        if (checkRecursiveAttack(teamColor, row, col)){
             return true;
         }
-        if (checkRookAttack(teamColor, row, col)){
-            return true;
+        if(teamColor == TeamColor.WHITE){
+            int newRow = row + 1;
+            return checkPawnAttack(teamColor, newRow, col);
         }
-        if (checkBishopAttack(teamColor, row, col)){
-            return true;
+        else if(teamColor == TeamColor.BLACK){
+            int newRow = row - 1;
+            return checkPawnAttack(teamColor, newRow, col);
         }
-        if (checkQueenAttack(teamColor, row, col)){
-            return true;
+        else{
+            return false;
+        }
+    }
+
+    private boolean checkPawnAttack(TeamColor teamColor, int newRow, int col) {
+        for(int i=-1; i<2; i+=2){
+            if(col+i >0 && col+1 <9){
+                ChessPosition attack = new ChessPosition(newRow, col +i);
+                ChessPiece attackPiece = board.getPiece(attack);
+                if(attackPiece != null){
+                    TeamColor newPieceColor = attackPiece.getTeamColor();
+                    if(newPieceColor != teamColor){
+                        return true;
+                    }
+                }
+            }
         }
         return false;
-
-        //throw new RuntimeException("Not implemented");
     }
 
-    private boolean checkKnightAttack(TeamColor teamColor, int row, int col){
+    private boolean checkJumpAttack(TeamColor teamColor, int row, int col) {
         int[][] combinations = {
-                {1,2},
-                {1,-2},
-                {-1,2},
-                {-1,-2},
-                {2,1},
-                {2,-1},
-                {-2,1},
-                {-2,-1}
+                //possible opposing knight positions
+                {1,2}, {1,-2}, {-1,2}, {-1,-2}, {2,1}, {2,-1}, {-2,1}, {-2,-1},
+                //possible opposing king positions
+                {0,1}, {0,-1}, {1,0}, {-1,0}, {1,1}, {1,-1}, {-1,1}, {-1,-1}
         };
-        return checkJumpAttack(teamColor, combinations, row, col);
-    }
-
-    private boolean checkKingAttack(TeamColor teamColor, int row, int col){
-        int[][] combinations = {
-                {0,1},
-                {0,-1},
-                {1,0},
-                {-1,0},
-                {1,1},
-                {1,-1},
-                {-1,1},
-                {-1,-1}
-        };
-        return checkJumpAttack(teamColor, combinations, row, col);
-    }
-
-    private boolean checkRookAttack(TeamColor teamColor, int row, int col){
-        int[][] combinations = {
-                {1,0},
-                {-1,0},
-                {0,1},
-                {0,-1}
-        };
-        return checkRecursiveAttack(teamColor, combinations, row, col);
-    }
-
-    private boolean checkBishopAttack(TeamColor teamColor, int row, int col){
-        int[][] combinations = {
-                {1,1},
-                {1,-1},
-                {-1,1},
-                {-1,-1}
-        };
-        return checkRecursiveAttack(teamColor, combinations, row, col);
-    }
-
-    private boolean checkQueenAttack(TeamColor teamColor, int row, int col){
-        int[][] combinations = {
-                {1,0},
-                {-1,0},
-                {0,1},
-                {0,-1},
-                {1,1},
-                {1,-1},
-                {-1,1},
-                {-1,-1}
-        };
-        return checkRecursiveAttack(teamColor, combinations, row, col);
-    }
-
-
-    private boolean checkJumpAttack(TeamColor teamColor, int[][] combinations, int row, int col) {
         for (int i = 0; i < combinations.length; i++) {
             int newRow = row + combinations[i][0];
             int newCol = col + combinations[i][1];
@@ -204,7 +162,14 @@ public class ChessGame {
         return false;
     }
 
-    private boolean checkRecursiveAttack(TeamColor teamColor, int[][] combinations, int row, int col){
+    private boolean checkRecursiveAttack(TeamColor teamColor, int row, int col){
+        int[][] combinations = {
+                //possible opposing rook positions
+                {1,0}, {-1,0}, {0,1}, {0,-1},
+                //possible opposing bishop positions
+                {1,1}, {1,-1}, {-1,1}, {-1,-1}
+        };
+
         for (int i=0; i<combinations.length; i++){
             int newRow = row + combinations[i][0];
             int newCol = col + combinations[i][1];
