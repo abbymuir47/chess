@@ -1,5 +1,6 @@
 package chess;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Objects;
 
@@ -20,6 +21,10 @@ public class ChessGame {
         board = new ChessBoard();
         board.resetBoard();
         team = TeamColor.WHITE;
+    }
+
+    public ChessGame(ChessGame copy) {
+        this.board = new String(copy.board);
     }
 
     /**
@@ -59,13 +64,31 @@ public class ChessGame {
      * making that move would not leave the team’s king in danger of check.
      */
     public Collection<ChessMove> validMoves(ChessPosition startPosition) {
-        throw new RuntimeException("Not implemented");
-        /*
-        if(board.getPiece(startPosition)==null){
+        Collection<ChessMove> validMoves = new ArrayList<>();
+        ChessPiece currPiece = board.getPiece(startPosition);
+
+        if(currPiece ==null){
             return null;
         }
-        else{}
-         */
+        else{
+            //ChessPiece.PieceType type = currPiece.getPieceType();
+            team = currPiece.getTeamColor();
+            Collection<ChessMove> possibleMoves = currPiece.pieceMoves(board, startPosition);
+            for (ChessMove move:possibleMoves){
+                ChessPosition potentialPosition = move.getEndPosition();
+
+                //make a copy of the chessboard
+                ChessBoard copy = board;
+
+                copy.addPiece(potentialPosition, currPiece);
+
+                //how do i call the isInCheck function on the copy of the board, rather than on the board itself?
+                if(!isInCheck(team)){
+                    validMoves.add(move);
+                }
+            }
+        }
+        return validMoves;
     }
 
     /**
