@@ -101,6 +101,15 @@ public class ChessGame {
         if (checkKingAttack(teamColor, row, col)){
             return true;
         }
+        if (checkRookAttack(teamColor, row, col)){
+            return true;
+        }
+        if (checkBishopAttack(teamColor, row, col)){
+            return true;
+        }
+        if (checkQueenAttack(teamColor, row, col)){
+            return true;
+        }
         return false;
 
         //throw new RuntimeException("Not implemented");
@@ -117,7 +126,7 @@ public class ChessGame {
                 {-2,1},
                 {-2,-1}
         };
-        return checkPotentialAttack(teamColor, combinations, row, col);
+        return checkJumpAttack(teamColor, combinations, row, col);
     }
 
     private boolean checkKingAttack(TeamColor teamColor, int row, int col){
@@ -131,11 +140,45 @@ public class ChessGame {
                 {-1,1},
                 {-1,-1}
         };
-        return checkPotentialAttack(teamColor, combinations, row, col);
+        return checkJumpAttack(teamColor, combinations, row, col);
+    }
+
+    private boolean checkRookAttack(TeamColor teamColor, int row, int col){
+        int[][] combinations = {
+                {1,0},
+                {-1,0},
+                {0,1},
+                {0,-1}
+        };
+        return checkRecursiveAttack(teamColor, combinations, row, col);
+    }
+
+    private boolean checkBishopAttack(TeamColor teamColor, int row, int col){
+        int[][] combinations = {
+                {1,1},
+                {1,-1},
+                {-1,1},
+                {-1,-1}
+        };
+        return checkRecursiveAttack(teamColor, combinations, row, col);
+    }
+
+    private boolean checkQueenAttack(TeamColor teamColor, int row, int col){
+        int[][] combinations = {
+                {1,0},
+                {-1,0},
+                {0,1},
+                {0,-1},
+                {1,1},
+                {1,-1},
+                {-1,1},
+                {-1,-1}
+        };
+        return checkRecursiveAttack(teamColor, combinations, row, col);
     }
 
 
-    private boolean checkPotentialAttack(TeamColor teamColor, int[][] combinations, int row, int col) {
+    private boolean checkJumpAttack(TeamColor teamColor, int[][] combinations, int row, int col) {
         for (int i = 0; i < combinations.length; i++) {
             int newRow = row + combinations[i][0];
             int newCol = col + combinations[i][1];
@@ -155,6 +198,29 @@ public class ChessGame {
                 }
                 else{
                     continue;
+                }
+            }
+        }
+        return false;
+    }
+
+    private boolean checkRecursiveAttack(TeamColor teamColor, int[][] combinations, int row, int col){
+        for (int i=0; i<combinations.length; i++){
+            int newRow = row + combinations[i][0];
+            int newCol = col + combinations[i][1];
+
+            while(newRow>=1 && newRow<=8 && newCol>=1 && newCol<=8){
+                ChessPosition newPos = new ChessPosition(newRow, newCol);
+                if(board.getPiece(newPos) != null){
+                    ChessPiece newPiece = board.getPiece(newPos);
+                    ChessGame.TeamColor newPieceColor = newPiece.getTeamColor();
+                    if(newPieceColor != teamColor){
+                        return true;
+                    }
+                }
+                else{
+                    newRow += combinations[i][0];
+                    newCol += combinations[i][1];
                 }
             }
         }
