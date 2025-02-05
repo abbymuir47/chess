@@ -107,27 +107,38 @@ public class ChessGame {
         if (checkBishopAttack(teamColor, row, col)){
             return true;
         }
-
         //doesn't need to check queen attack bc the queen is included when rook and bishop are checked
 
         if(teamColor == TeamColor.WHITE){
-            int newRow = row + 1;
-            return checkPawnAttack(teamColor, newRow, col);
+            if(row <8){
+                int newRow = row + 1;
+                return checkPawnAttack(teamColor, newRow, col);
+            }
+            else{
+                return false;
+            }
         }
         if(teamColor == TeamColor.BLACK){
-            int newRow = row - 1;
-            return checkPawnAttack(teamColor, newRow, col);
+            if(row >1){
+                int newRow = row - 1;
+                return checkPawnAttack(teamColor, newRow, col);
+            }
+            else{
+                return false;
+            }
         }
-
         return false;
-
-        //throw new RuntimeException("Not implemented");
     }
+
     private boolean checkPawnAttack(TeamColor teamColor, int newRow, int col) {
+        //System.out.println("newRow:" + newRow);
         for (int i = -1; i < 2; i += 2) {
+            //System.out.println("i:" + i);
             int newCol = col + i;
+            //System.out.println("newCol:" + newCol);
 
             if (newCol >= 1 && newCol <= 8) {
+                //System.out.println("in the if statement");
                 ChessPosition attack = new ChessPosition(newRow, newCol);
                 ChessPiece attackPiece = board.getPiece(attack);
 
