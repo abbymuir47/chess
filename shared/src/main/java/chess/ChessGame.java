@@ -107,12 +107,39 @@ public class ChessGame {
         if (checkBishopAttack(teamColor, row, col)){
             return true;
         }
-        if (checkQueenAttack(teamColor, row, col)){
-            return true;
+
+        //doesn't need to check queen attack bc the queen is included when rook and bishop are checked
+
+        if(teamColor == TeamColor.WHITE){
+            int newRow = row + 1;
+            return checkPawnAttack(teamColor, newRow, col);
         }
+        if(teamColor == TeamColor.BLACK){
+            int newRow = row - 1;
+            return checkPawnAttack(teamColor, newRow, col);
+        }
+
         return false;
 
         //throw new RuntimeException("Not implemented");
+    }
+    private boolean checkPawnAttack(TeamColor teamColor, int newRow, int col) {
+        for (int i = -1; i < 2; i += 2) {
+            int newCol = col + i;
+
+            if (newCol >= 1 && newCol <= 8) {
+                ChessPosition attack = new ChessPosition(newRow, newCol);
+                ChessPiece attackPiece = board.getPiece(attack);
+
+                if (attackPiece != null) {
+                    TeamColor newPieceColor = attackPiece.getTeamColor();
+                    if (newPieceColor != teamColor) {
+                        return true;
+                    }
+                }
+            }
+        }
+        return false;
     }
 
     private boolean checkKnightAttack(TeamColor teamColor, int row, int col){
@@ -162,19 +189,6 @@ public class ChessGame {
         return checkRecursiveAttack(teamColor, combinations, row, col, BISHOP);
     }
 
-        private boolean checkQueenAttack(TeamColor teamColor, int row, int col){
-            int[][] combinations = {
-                    {1,0},
-                    {-1,0},
-                    {0,1},
-                    {0,-1},
-                    {1,1},
-                    {1,-1},
-                    {-1,1},
-                    {-1,-1}
-            };
-            return checkRecursiveAttack(teamColor, combinations, row, col, QUEEN);
-        }
 
         private boolean checkJumpAttack(TeamColor teamColor, int[][] combinations, int row, int col, ChessPiece.PieceType type) {
             for (int i = 0; i < combinations.length; i++) {
@@ -183,7 +197,7 @@ public class ChessGame {
                 ChessPosition newPos = new ChessPosition(newRow, newCol);
                 ChessPiece newPiece;
 
-                if(newRow<1 | newRow>8 | newCol<1 | newCol>8){
+                if(newRow<1 || newRow>8 || newCol<1 || newCol>8){
                     continue;
                 }
                 else{
@@ -214,7 +228,7 @@ public class ChessGame {
                         ChessPiece newPiece = board.getPiece(newPos);
                         ChessGame.TeamColor newPieceColor = newPiece.getTeamColor();
                         if(newPieceColor != teamColor){
-                            if(newPiece.getPieceType() == type){
+                            if(newPiece.getPieceType() == type || newPiece.getPieceType() == QUEEN){
                                 return true;
                             }
                         }
@@ -222,10 +236,8 @@ public class ChessGame {
                             break;
                         }
                     }
-                    else{
-                        newRow += combinations[i][0];
-                        newCol += combinations[i][1];
-                    }
+                    newRow += combinations[i][0];
+                    newCol += combinations[i][1];
                 }
             }
             return false;
