@@ -100,7 +100,7 @@ public class ChessBoard {
     @Override
     public String toString() {
         StringBuilder boardString = new StringBuilder();
-        for (int i = 0; i < 8; i++) {
+        for (int i = 7; i >=0; i--) {
             boardString.append("|");  // Start the row with a pipe character
             for (int j = 0; j < 8; j++) {
                 ChessPiece piece = squares[i][j];

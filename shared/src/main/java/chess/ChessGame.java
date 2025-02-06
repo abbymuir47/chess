@@ -80,7 +80,7 @@ public class ChessGame {
 
                 //make a copy of the chessgame
                 ChessGame copy = new ChessGame(this);
-                System.out.println("curr move: " + move);
+                //System.out.println("curr move: " + move);
 
                 //System.out.println("copy board before adding piece: \n" + copy.toString());
                 copy.board.addPiece(potentialPosition, currPiece);
@@ -109,17 +109,28 @@ public class ChessGame {
      */
     public void makeMove(ChessMove move) throws InvalidMoveException {
         ChessPosition startPosition = move.getStartPosition();
-        ChessPosition endPosition = move.getStartPosition();
+        ChessPosition endPosition = move.getEndPosition();
 
         ChessPiece currPiece = board.getPiece(startPosition);
+        ChessGame.TeamColor pieceColor = currPiece.getTeamColor();
+        if(pieceColor == team){
+            Collection<ChessMove> validMoves = validMoves(startPosition);
+            //System.out.println("valid moves:" + validMoves);
+            //System.out.println("move to make:" + move);
 
-        Collection<ChessMove> validMoves = validMoves(startPosition);
-        if(validMoves.contains(move)){
-            board.addPiece(endPosition, currPiece);
-            board.addPiece(startPosition, null);
-        }
-        else{
-            throw new InvalidMoveException();
+            if(validMoves.contains(move)){
+                //System.out.println("move found");
+                //System.out.println("board before moving piece:\n" + board.toString());
+                board.addPiece(endPosition, currPiece);
+                board.addPiece(startPosition, null);
+                //System.out.println("board after moving piece:\n" + board.toString());
+                if(team == TeamColor.WHITE){
+                    team = TeamColor.BLACK;
+                }
+                else{
+                    team = TeamColor.WHITE;
+                }
+            }
         }
     }
 
