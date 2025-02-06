@@ -80,16 +80,16 @@ public class ChessGame {
 
                 //make a copy of the chessgame
                 ChessGame copy = new ChessGame(this);
-                copy.board.addPiece(potentialPosition, currPiece);
+                System.out.println("curr move: " + move);
 
-                //how do i call the isInCheck function on the copy of the board, rather than on the board itself?
+                //System.out.println("copy board before adding piece: \n" + copy.toString());
+                copy.board.addPiece(potentialPosition, currPiece);
+                copy.board.addPiece(startPosition, null);
+                //System.out.println("copy board after adding piece: \n" + copy.toString());
+
                 if(!copy.isInCheck(team)){
-                    //System.out.println("copy board is not in check, curr move is: " + move);
-                    System.out.println("copy board: \n" + board.toString());
+                    //System.out.println("copy board is not in check");
                     validMoves.add(move);
-                }
-                else{
-                    System.out.println("copy board IS in check, curr move is: " + move);
                 }
                 copy = null;
             }
@@ -108,17 +108,19 @@ public class ChessGame {
      * or if it’s not the corresponding team's turn.
      */
     public void makeMove(ChessMove move) throws InvalidMoveException {
-//        ChessPosition startPosition = move.getStartPosition();
-//        ChessPosition endPosition = move.getStartPosition();
-//
-//        ChessPiece currPiece = board.getPiece(startPosition);
-//
-//        Collection<ChessMove> validMoves = validMoves(startPosition);
-//        if(validMoves.contains(move)){
-//            board.addPiece(endPosition, currPiece);
-//            board.addPiece(startPosition, null);
-//        }
-        throw new RuntimeException("Not implemented");
+        ChessPosition startPosition = move.getStartPosition();
+        ChessPosition endPosition = move.getStartPosition();
+
+        ChessPiece currPiece = board.getPiece(startPosition);
+
+        Collection<ChessMove> validMoves = validMoves(startPosition);
+        if(validMoves.contains(move)){
+            board.addPiece(endPosition, currPiece);
+            board.addPiece(startPosition, null);
+        }
+        else{
+            throw new InvalidMoveException();
+        }
     }
 
     /**
