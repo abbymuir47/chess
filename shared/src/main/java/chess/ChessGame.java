@@ -343,7 +343,8 @@ public class ChessGame {
          */
         public boolean isInCheckmate(TeamColor teamColor) {
             Collection<ChessPosition> teamPositions = findAllTeamMembers(teamColor);
-
+            //System.out.println("is in check: " + isInCheck(teamColor));
+            //System.out.println("valid moves exist: " + validMovesExist(teamPositions));
             return isInCheck(teamColor) && !validMovesExist(teamPositions);
         }
 
@@ -351,7 +352,7 @@ public class ChessGame {
     private boolean validMovesExist(Collection<ChessPosition> teamPositions) {
         for(ChessPosition position : teamPositions){
             Collection<ChessMove> validMoves = validMoves(position);
-            if(validMoves != null){
+            if(!validMoves.isEmpty()){
                 return true;
             }
         }
@@ -385,7 +386,8 @@ public class ChessGame {
          */
         public boolean isInStalemate(TeamColor teamColor) {
             //!isincheck && !validmoves
-            throw new RuntimeException("Not implemented");
+            Collection<ChessPosition> teamPositions = findAllTeamMembers(teamColor);
+            return !isInCheck(teamColor) && !validMovesExist(teamPositions);
         }
 
         /**
