@@ -23,8 +23,9 @@ public class ChessGame {
         team = TeamColor.WHITE;
     }
 
-    public ChessGame(ChessGame copy) {
-        this.board = new String(copy.board);
+    public ChessGame(ChessGame original) {
+        this.board = new ChessBoard(original.board);
+        this.team = original.team;
     }
 
     /**
@@ -77,15 +78,15 @@ public class ChessGame {
             for (ChessMove move:possibleMoves){
                 ChessPosition potentialPosition = move.getEndPosition();
 
-                //make a copy of the chessboard
-                ChessBoard copy = board;
-
-                copy.addPiece(potentialPosition, currPiece);
+                //make a copy of the chessgame
+                ChessGame copy = new ChessGame(this);
+                copy.board.addPiece(potentialPosition, currPiece);
 
                 //how do i call the isInCheck function on the copy of the board, rather than on the board itself?
-                if(!isInCheck(team)){
+                if(!copy.isInCheck(team)){
                     validMoves.add(move);
                 }
+                copy = null;
             }
         }
         return validMoves;

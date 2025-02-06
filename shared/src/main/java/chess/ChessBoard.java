@@ -18,6 +18,15 @@ public class ChessBoard {
     public ChessBoard() {
     }
 
+    public ChessBoard(ChessBoard original) {
+        //loop through and make a deep copy of the original chessboard
+        for (int i=0; i<8; i++){
+            for (int j=0; j<8; j++) {
+                this.squares[i][j] = original.squares[i][j];
+            }
+        }
+    }
+
     /**
      * Adds a chess piece to the chessboard
      *
