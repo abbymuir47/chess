@@ -84,7 +84,12 @@ public class ChessGame {
 
                 //how do i call the isInCheck function on the copy of the board, rather than on the board itself?
                 if(!copy.isInCheck(team)){
+                    //System.out.println("copy board is not in check, curr move is: " + move);
+                    System.out.println("copy board: \n" + board.toString());
                     validMoves.add(move);
+                }
+                else{
+                    System.out.println("copy board IS in check, curr move is: " + move);
                 }
                 copy = null;
             }
@@ -103,6 +108,16 @@ public class ChessGame {
      * or if it’s not the corresponding team's turn.
      */
     public void makeMove(ChessMove move) throws InvalidMoveException {
+//        ChessPosition startPosition = move.getStartPosition();
+//        ChessPosition endPosition = move.getStartPosition();
+//
+//        ChessPiece currPiece = board.getPiece(startPosition);
+//
+//        Collection<ChessMove> validMoves = validMoves(startPosition);
+//        if(validMoves.contains(move)){
+//            board.addPiece(endPosition, currPiece);
+//            board.addPiece(startPosition, null);
+//        }
         throw new RuntimeException("Not implemented");
     }
 

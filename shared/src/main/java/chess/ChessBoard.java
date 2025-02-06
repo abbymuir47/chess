@@ -99,8 +99,25 @@ public class ChessBoard {
 
     @Override
     public String toString() {
-        return "ChessBoard{" +
-                "squares=" + Arrays.toString(squares) +
-                '}';
+        StringBuilder boardString = new StringBuilder();
+        for (int i = 0; i < 8; i++) {
+            boardString.append("|");  // Start the row with a pipe character
+            for (int j = 0; j < 8; j++) {
+                ChessPiece piece = squares[i][j];
+
+                if (piece != null) {
+                    boardString.append(piece.toString());
+                } else {
+                    boardString.append(" ");
+                }
+                boardString.append("|");
+            }
+            boardString.append("\n");  // Add a newline after each row
+        }
+
+        return boardString.toString();  // Return the final string
+//        return "ChessBoard{" +
+//                "squares=" + Arrays.toString(squares) +
+//                '}';
     }
 }

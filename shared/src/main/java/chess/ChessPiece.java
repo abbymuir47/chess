@@ -81,36 +81,50 @@ public class ChessPiece {
 
     @Override
     public String toString() {
+        if(pieceColor== ChessGame.TeamColor.WHITE){
+            if(type == PieceType.PAWN){
+                return "P";
+            }
+            if(type == PieceType.QUEEN){
+                return "Q";
+            }
+            if(type == PieceType.KING){
+                return "K";
+            }
+            if(type == PieceType.KNIGHT){
+                return "N";
+            }
+            if(type == PieceType.ROOK){
+                return "R";
+            }
+            if(type == PieceType.BISHOP){
+                return "B";
+            }
+        }
+        else if(pieceColor== ChessGame.TeamColor.BLACK){
+            if(type == PieceType.PAWN){
+                return "p";
+            }
+            if(type == PieceType.QUEEN){
+                return "q";
+            }
+            if(type == PieceType.KING){
+                return "k";
+            }
+            if(type == PieceType.KNIGHT){
+                return "n";
+            }
+            if(type == PieceType.ROOK){
+                return "r";
+            }
+            if(type == PieceType.BISHOP){
+                return "b";
+            }
+        }
+
         return "ChessPiece{" +
                 "pieceColor=" + pieceColor +
                 ", type=" + type +
                 '}';
     }
 }
-
-/*
- ChessPiece piece = board.getPiece(myPosition);
-        type = piece.getPieceType();
-        switch (type) {
-            case PAWN:
-                PawnMovesCalculator pawnMoves = new PawnMovesCalculator();
-                return pawnMoves.pieceMoves(board, myPosition);
-            case ROOK:
-                RookMovesCalculator rookMoves = new RookMovesCalculator();
-                return rookMoves.pieceMoves(board, myPosition);
-            case KNIGHT:
-                KnightMovesCalculator knightMoves = new KnightMovesCalculator();
-                return knightMoves.pieceMoves(board, myPosition);
-            case BISHOP:
-                BishopMovesCalculator bishopMoves = new BishopMovesCalculator();
-                return bishopMoves.pieceMoves(board, myPosition);
-            case KING:
-                KingMovesCalculator kingMoves = new KingMovesCalculator();
-                return kingMoves.pieceMoves(board, myPosition);
-            case QUEEN:
-                QueenMovesCalculator queenMoves = new QueenMovesCalculator();
-                return queenMoves.pieceMoves(board, myPosition);
-            default:
-                throw new IllegalArgumentException();
-        }
- */
