@@ -72,7 +72,6 @@ public class ChessGame {
             return null;
         }
         else{
-            //ChessPiece.PieceType type = currPiece.getPieceType();
             team = currPiece.getTeamColor();
             Collection<ChessMove> possibleMoves = currPiece.pieceMoves(board, startPosition);
             for (ChessMove move:possibleMoves){
@@ -80,15 +79,11 @@ public class ChessGame {
 
                 //make a copy of the chessgame
                 ChessGame copy = new ChessGame(this);
-                //System.out.println("curr move: " + move);
 
-                //System.out.println("copy board before adding piece: \n" + copy.toString());
                 copy.board.addPiece(potentialPosition, currPiece);
                 copy.board.addPiece(startPosition, null);
-                //System.out.println("copy board after adding piece: \n" + copy.toString());
 
                 if(!copy.isInCheck(team)){
-                    //System.out.println("copy board is not in check");
                     validMoves.add(move);
                 }
                 copy = null;
@@ -110,20 +105,30 @@ public class ChessGame {
     public void makeMove(ChessMove move) throws InvalidMoveException {
         ChessPosition startPosition = move.getStartPosition();
         ChessPosition endPosition = move.getEndPosition();
+        ChessPiece.PieceType promotionPiece = move.getPromotionPiece();
 
         ChessPiece currPiece = board.getPiece(startPosition);
+        if(currPiece == null){
+            throw new InvalidMoveException("Empty square");
+        }
+
         ChessGame.TeamColor pieceColor = currPiece.getTeamColor();
+
+        //makes sure the piece is playing in turn
         if(pieceColor == team){
             Collection<ChessMove> validMoves = validMoves(startPosition);
-            //System.out.println("valid moves:" + validMoves);
-            //System.out.println("move to make:" + move);
 
             if(validMoves.contains(move)){
-                //System.out.println("move found");
-                //System.out.println("board before moving piece:\n" + board.toString());
+                System.out.println("board before moving piece; \n" + board);
+                if(promotionPiece != null){
+                    currPiece = new ChessPiece(pieceColor, promotionPiece);
+                }
+
                 board.addPiece(endPosition, currPiece);
                 board.addPiece(startPosition, null);
-                //System.out.println("board after moving piece:\n" + board.toString());
+                System.out.println("board after moving piece; \n" + board);
+
+                //switches team color after the move is made
                 if(team == TeamColor.WHITE){
                     team = TeamColor.BLACK;
                 }
@@ -131,6 +136,12 @@ public class ChessGame {
                     team = TeamColor.WHITE;
                 }
             }
+            else{
+                throw new InvalidMoveException("This was not a valid move");
+            }
+        }
+        else{
+            throw new InvalidMoveException("It is not your turn");
         }
     }
 
