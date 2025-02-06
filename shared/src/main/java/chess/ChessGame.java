@@ -342,10 +342,39 @@ public class ChessGame {
          * Returns true if the given team has no way to protect their king from being captured
          */
         public boolean isInCheckmate(TeamColor teamColor) {
-            throw new RuntimeException("Not implemented");
+            Collection<ChessPosition> teamPositions = findAllTeamMembers(teamColor);
+
+            return isInCheck(teamColor) && !validMovesExist(teamPositions);
         }
 
-        /**
+        //returns true if valid moves are found, and false if not
+    private boolean validMovesExist(Collection<ChessPosition> teamPositions) {
+        for(ChessPosition position : teamPositions){
+            Collection<ChessMove> validMoves = validMoves(position);
+            if(validMoves != null){
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public Collection<ChessPosition> findAllTeamMembers(TeamColor teamColor) {
+            Collection<ChessPosition> teamMembers = new ArrayList<>();
+            ChessPosition currPos;
+            ChessPiece currPiece;
+            for(int i = 1; i<9; i++){
+                for(int j=1;j<9;j++){
+                    currPos = new ChessPosition(i,j);
+                    currPiece = board.getPiece(currPos);
+                    if (currPiece != null && currPiece.getTeamColor() == teamColor){
+                        teamMembers.add(currPos);
+                    }
+                }
+            }
+            return teamMembers;
+        }
+
+    /**
          * Determines if the given team is in stalemate, which here is defined as having
          * no valid moves
          *
@@ -355,6 +384,7 @@ public class ChessGame {
          * can't make any moves that wouldn't put your king in check
          */
         public boolean isInStalemate(TeamColor teamColor) {
+            //!isincheck && !validmoves
             throw new RuntimeException("Not implemented");
         }
 
