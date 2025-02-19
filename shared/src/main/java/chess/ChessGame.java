@@ -299,10 +299,9 @@ public class ChessGame {
                     if(board.getPiece(newPos) != null){
                         ChessPiece newPiece = board.getPiece(newPos);
                         ChessGame.TeamColor newPieceColor = newPiece.getTeamColor();
-                        if(newPieceColor != teamColor){
-                            if(newPiece.getPieceType() == type || newPiece.getPieceType() == QUEEN){
-                                return true;
-                            }
+                        if(newPieceColor != teamColor &&
+                                (newPiece.getPieceType() == type || newPiece.getPieceType() == QUEEN)){
+                            return true;
                         }
                         else{
                             break;
