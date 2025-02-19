@@ -27,7 +27,9 @@ public class PawnMovesCalculator implements PieceMovesCalculator{
         return moves;
     }
 
-    private static void validateMoves(ChessBoard board, ChessPosition position, Collection<ChessMove> moves, ChessGame.TeamColor myColor, int forward, int startRow, int endRow) {
+    private static void validateMoves(
+            ChessBoard board, ChessPosition position, Collection<ChessMove> moves,
+            ChessGame.TeamColor myColor, int forward, int startRow, int endRow) {
         int row = position.getRow();
         int col = position.getColumn();
 
@@ -43,7 +45,9 @@ public class PawnMovesCalculator implements PieceMovesCalculator{
         checkAttack(col > 1, board, attackLeft, myColor, moves, position, endRow);
     }
 
-    private static void checkForward(ChessBoard board, ChessPosition position, Collection<ChessMove> moves, int forward, int startRow, int endRow, ChessPosition forwardMove, int row, int col) {
+    private static void checkForward(ChessBoard board, ChessPosition position, Collection<ChessMove> moves,
+                                     int forward, int startRow, int endRow,
+                                     ChessPosition forwardMove, int row, int col) {
         if(board.getPiece(forwardMove) == null){
             if (row == endRow){
                 promote(position, moves, forwardMove);
@@ -61,7 +65,9 @@ public class PawnMovesCalculator implements PieceMovesCalculator{
         }
     }
 
-    private static void checkAttack(boolean col, ChessBoard board, ChessPosition newPos, ChessGame.TeamColor myColor, Collection<ChessMove> moves, ChessPosition position, int endRow) {
+    private static void checkAttack(boolean col, ChessBoard board, ChessPosition newPos,
+                                    ChessGame.TeamColor myColor, Collection<ChessMove> moves,
+                                    ChessPosition position, int endRow) {
         if (col) {
             ChessPiece newPiece = board.getPiece(newPos);
             if (newPiece != null && newPiece.getTeamColor() != myColor) {

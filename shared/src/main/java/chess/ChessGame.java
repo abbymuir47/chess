@@ -278,10 +278,8 @@ public class ChessGame {
                     newPiece = board.getPiece(newPos);
                     if(newPiece != null){
                         TeamColor newPieceColor = newPiece.getTeamColor();
-                        if(newPieceColor != teamColor){
-                            if(newPiece.getPieceType() == type){
+                        if(newPieceColor!=teamColor && newPiece.getPieceType()==type){
                                 return true;
-                            }
                         }
                     }
                     else{
