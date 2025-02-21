@@ -24,13 +24,13 @@ public class Server {
         // endpoint 2: login
         Spark.post("/session", this::login);
         // endpoint 3: logout
-        Spark.delete("/session/:authToken", this::logout);
+        Spark.delete("/session", this::logout);
         // endpoint 4: list games
-        Spark.get("/game/:authToken", this::listGames);
+        Spark.get("/game", this::listGames);
         // endpoint 5: create game
-        Spark.post("/game/:authToken", this::createGame);
+        Spark.post("/game", this::createGame);
         // endpoint 6: join game
-        Spark.put("/game/:authToken", this::joinGame);
+        Spark.put("/game", this::joinGame);
         // endpoint 7: clear
         Spark.delete("/db", this::clear);
 
@@ -76,10 +76,10 @@ public class Server {
     }
 
     //questions:
-    // why create a constructor? why'd they do that with petshop?
     // how to pass in authToken - the header gets passed in? how is the body passed in, through the request?
-    // what are the Pet objects / what's the Pet class being used?
-    // Spark.exception
+    // where / how to create authToken - in the handler? no prob not till the service
+    // what are the Pet objects / what's the Pet class being used? - model class objects - should registerResult be a model class, and how does that fit in with UserData, AuthData, and GameData (which are the 3 that the spec told us we need to have)
+    // Spark.exception - would be wise to create multiple exceptions
     // Spark.awaitInitialization()
 
 }
