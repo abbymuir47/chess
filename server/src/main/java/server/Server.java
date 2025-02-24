@@ -1,16 +1,23 @@
 package server;
 
+import com.google.gson.Gson;
+//import exception.ResponseException;
+import handlerModel.*;
+
+import service.UserService;
 import spark.*;
 
 public class Server {
 
-    private final Server service;
+    private final UserService userService;
 
-    /* # tbh not sure why I need this constructor, but they have it in pet shop
-    public Server(Server service){
-        this.service = service;
+    public Server(){
+        this.userService = null;
     }
-    */
+
+    public Server(UserService service){
+        this.userService = service;
+    }
 
     public int run(int desiredPort) {
         Spark.port(desiredPort);
@@ -48,7 +55,9 @@ public class Server {
     }
 
     private Object register(Request request, Response response) {
-        return null;
+        RegisterRequest registerRequest = new Gson().fromJson(request.body(), RegisterRequest.class);
+        RegisterResult registerResult = userService.register(registerRequest);
+        return new Gson().toJson(registerResult);
     }
 
     private Object login(Request request, Response response) {
