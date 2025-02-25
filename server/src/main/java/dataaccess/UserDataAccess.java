@@ -7,18 +7,17 @@ import java.util.HashMap;
 
 public class UserDataAccess implements UserDAO {
 
-    final private HashMap<UserData> users = new HashMap<>();
+    final private HashMap<String, UserData> users = new HashMap<>();
+
+    public UserData getUser(String username) {
+        return users.get(username);
+    }
 
     public UserData createUser(UserData user) {
         user = new UserData(user.username(), user.password(), user.email());
-        //in petshop they have an integer for id, should i implement that that way?
 
-        users.put(user);
+        users.put(user.username(), user);
         return user;
-    }
-
-    public UserData getPet(String username) {
-        return users.get(username);
     }
 
     /*
