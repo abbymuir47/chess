@@ -14,9 +14,9 @@ public class UserDataAccess implements UserDAO {
     }
 
     public UserData createUser(UserData user) {
-        user = new UserData(user.username(), user.password(), user.email());
+        UserData myUser = new UserData(user.username(), user.password(), user.email());
 
-        users.put(user.username(), user);
+        users.put(user.username(), myUser);
         return user;
     }
 

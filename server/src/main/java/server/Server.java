@@ -4,7 +4,7 @@ import com.google.gson.Gson;
 //import exception.ResponseException;
 import handlerModel.*;
 
-import service.UserService;
+import service.*;
 import spark.*;
 
 public class Server {
