@@ -21,6 +21,10 @@ public class UserService {
 
     public RegisterResult register(RegisterRequest registerRequest) throws DataAccessException {
 
+        if (registerRequest.username() == null || registerRequest.password() == null || registerRequest.email() == null) {
+            throw new DataAccessException(400, "Error: bad request - all fields must be filled");
+        }
+
         UserData user = userDataAccess.getUser(registerRequest.username());
         if(user != null){
             throw new DataAccessException(400, "Error: user already exists");
@@ -31,7 +35,7 @@ public class UserService {
             String authToken = AuthService.generateToken();
             AuthData myAuth = new AuthData(authToken, registerRequest.username());
             AuthData auth = authDataAccess.createAuth(myAuth);
-            RegisterResult result = new RegisterResult(authToken, registerRequest.username());
+            RegisterResult result = new RegisterResult(registerRequest.username(), authToken);
             return result;
         }
     }
