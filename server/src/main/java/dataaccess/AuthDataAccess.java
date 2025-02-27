@@ -11,11 +11,15 @@ public class AuthDataAccess implements AuthDAO {
 
     //public AuthData getAuth(String username) {return auths.get(username);}
 
+    @Override
     public AuthData createAuth(AuthData auth) {
         //AuthData myAuth = new AuthData(auth.authToken(), auth.username());
         auths.put(auth.authToken(), auth);
         return auth;
     }
 
-    // i know im not doing this right - should the hashmap
+    @Override
+    public void clearAuthDAO() throws DataAccessException{
+        auths.clear();
+    }
 }
