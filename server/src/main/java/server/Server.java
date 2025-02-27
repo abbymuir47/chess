@@ -12,6 +12,7 @@ import spark.*;
 public class Server {
 
     private final UserService userService;
+    private final AuthService authService;
     private final GameService gameService;
 
     private final UserDAO userDataAccess;
@@ -23,6 +24,7 @@ public class Server {
         this.authDataAccess = new AuthDataAccess();
         this.gameDataAccess = new GameDataAccess();
         this.userService = new UserService(userDataAccess,authDataAccess);
+        this.authService = new AuthService(userDataAccess,authDataAccess);
         this.gameService = new GameService(userDataAccess,authDataAccess,gameDataAccess);
     }
 
@@ -51,6 +53,7 @@ public class Server {
         Spark.put("/game", this::joinGame);
         // endpoint 7: clear
         Spark.delete("/db", this::clear);
+        Spark.exception(DataAccessException.class, this::exceptionHandler);
 
         //This line initializes the server and can be removed once you have a functioning endpoint 
         Spark.init();
@@ -65,6 +68,12 @@ public class Server {
         Spark.awaitStop();
     }
 
+    private void exceptionHandler(DataAccessException ex, Request req, Response res) {
+        res.status(ex.getStatusCode());
+        ExceptionMessage message = new ExceptionMessage(ex.getMessage());
+        res.body(new Gson().toJson(message));
+    }
+
     private Object register(Request request, Response response) throws DataAccessException {
         RegisterRequest registerRequest = new Gson().fromJson(request.body(), RegisterRequest.class);
         RegisterResult registerResult = userService.register(registerRequest);
@@ -73,7 +82,7 @@ public class Server {
 
     private Object clear(Request request, Response response) throws DataAccessException {
         ClearResult clearResult = gameService.clear();
-        return new Gson().toJson(clearResult);
+        return "";
     }
 
     private Object login(Request request, Response response) {

@@ -27,7 +27,7 @@ public class UserService {
 
         UserData user = userDataAccess.getUser(registerRequest.username());
         if(user != null){
-            throw new DataAccessException(400, "Error: user already exists");
+            throw new DataAccessException(403, "Error: user already exists");
         }
         else{
             UserData myUser = new UserData(registerRequest.username(), registerRequest.password(), registerRequest.email());

@@ -29,8 +29,5 @@ public class UserDataAccess implements UserDAO {
     public void deletePet(Integer id) {
         pets.remove(id);
     }
-    public void deleteAllPets() {
-        pets.clear();
-    }
      */
 }
