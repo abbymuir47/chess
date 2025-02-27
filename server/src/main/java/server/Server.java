@@ -28,10 +28,6 @@ public class Server {
         this.gameService = new GameService(userDataAccess,authDataAccess,gameDataAccess);
     }
 
-//    public Server(UserService service){
-//        this.userService = service;
-//    }
-
     public int run(int desiredPort) {
         Spark.port(desiredPort);
 
@@ -81,7 +77,9 @@ public class Server {
     }
 
     private Object clear(Request request, Response response) throws DataAccessException {
-        ClearResult clearResult = gameService.clear();
+        userService.clear();
+        authService.clear();
+        gameService.clear();
         return "";
     }
 

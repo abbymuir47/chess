@@ -22,6 +22,10 @@ public class AuthService {
     public static String generateToken() {
         return UUID.randomUUID().toString();
     }
+
+    public void clear() throws DataAccessException {
+        authDataAccess.clearAuthDAO();
+    }
 //    public LoginResult login(LoginRequest loginRequest) {}
 //    public void logout(LogoutRequest logoutRequest) {}
 }

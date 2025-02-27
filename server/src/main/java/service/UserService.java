@@ -39,6 +39,10 @@ public class UserService {
             return result;
         }
     }
+
+    public void clear() throws DataAccessException {
+        userDataAccess.clearUserDAO();
+    }
 //    public LoginResult login(LoginRequest loginRequest) {}
 //    public void logout(LogoutRequest logoutRequest) {}
 }

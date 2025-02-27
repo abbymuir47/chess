@@ -21,12 +21,8 @@ public class GameService {
         this.gameDataAccess = gameDataAccess;
     }
 
-    public ClearResult clear() throws DataAccessException {
-        userDataAccess.clearUserDAO();
-        authDataAccess.clearAuthDAO();
+    public void clear() throws DataAccessException {
         gameDataAccess.clearGameDAO();
-        ClearResult result = new ClearResult();
-        return result;
     }
 
 //    public LoginResult login(LoginRequest loginRequest) {}
