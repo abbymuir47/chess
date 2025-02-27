@@ -28,16 +28,12 @@ public class UserService {
         else{
             UserData myUser = new UserData(registerRequest.username(), registerRequest.password(), registerRequest.email());
             userDataAccess.createUser(myUser);
+            String authToken = AuthService.generateToken();
+            AuthData myAuth = new AuthData(authToken, registerRequest.username());
+            AuthData auth = authDataAccess.createAuth(myAuth);
+            RegisterResult result = new RegisterResult(authToken, user.username());
+            return result;
         }
-        /*
-        //create AuthData object, then create authtoken, then create RegisterResult object and return it
-
-        //AuthData auth = new
-        //RegisterResult result = new RegisterResult(user.username(), authData.authToken());
-        //return registerResult
-         */
-
-        return null;
     }
 //    public LoginResult login(LoginRequest loginRequest) {}
 //    public void logout(LogoutRequest logoutRequest) {}

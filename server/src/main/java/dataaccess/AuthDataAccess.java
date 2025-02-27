@@ -12,9 +12,8 @@ public class AuthDataAccess implements AuthDAO {
     //public AuthData getAuth(String username) {return auths.get(username);}
 
     public AuthData createAuth(AuthData auth) {
-        AuthData myAuth = new AuthData(auth.authToken(), auth.username());
-
-        auths.put(myAuth.authToken(), myAuth);
+        //AuthData myAuth = new AuthData(auth.authToken(), auth.username());
+        auths.put(auth.authToken(), auth);
         return auth;
     }
 

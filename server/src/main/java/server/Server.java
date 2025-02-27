@@ -2,17 +2,23 @@ package server;
 
 import com.google.gson.Gson;
 //import exception.ResponseException;
+import dataaccess.*;
 import handlerModel.*;
 
+import model.UserData;
 import service.*;
 import spark.*;
 
 public class Server {
 
     private final UserService userService;
+    private final UserDAO userDataAccess;
+    private final AuthDAO authDataAccess;
 
     public Server(){
-        this.userService = null;
+        this.userDataAccess = new UserDataAccess();
+        this.authDataAccess = new AuthDataAccess();
+        this.userService = new UserService(userDataAccess,authDataAccess);
     }
 
 //    public Server(UserService service){
@@ -54,7 +60,7 @@ public class Server {
         Spark.awaitStop();
     }
 
-    private Object register(Request request, Response response) {
+    private Object register(Request request, Response response) throws DataAccessException {
         RegisterRequest registerRequest = new Gson().fromJson(request.body(), RegisterRequest.class);
         RegisterResult registerResult = userService.register(registerRequest);
         return new Gson().toJson(registerResult);
