@@ -3,6 +3,7 @@ package service;
 import dataaccess.*;
 import handlerModel.*;
 import model.*;
+import org.eclipse.jetty.server.Authentication;
 
 import java.util.Collection;
 
@@ -25,7 +26,8 @@ public class UserService {
             throw new DataAccessException(400, "Error: user already exists");
         }
         else{
-            userDataAccess.createUser(user);
+            UserData myUser = new UserData(registerRequest.username(), registerRequest.password(), registerRequest.email());
+            userDataAccess.createUser(myUser);
         }
         /*
         //create AuthData object, then create authtoken, then create RegisterResult object and return it

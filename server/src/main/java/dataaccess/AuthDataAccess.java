@@ -7,7 +7,7 @@ import java.util.HashMap;
 
 public class AuthDataAccess implements AuthDAO {
 
-    final private HashMap<String, AuthData> auths = new HashMap<>();
+    private HashMap<String, AuthData> auths = new HashMap<>();
 
     //public AuthData getAuth(String username) {return auths.get(username);}
 

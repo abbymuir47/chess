@@ -15,9 +15,9 @@ public class Server {
         this.userService = null;
     }
 
-    public Server(UserService service){
-        this.userService = service;
-    }
+//    public Server(UserService service){
+//        this.userService = service;
+//    }
 
     public int run(int desiredPort) {
         Spark.port(desiredPort);
