@@ -12,13 +12,18 @@ import spark.*;
 public class Server {
 
     private final UserService userService;
+    private final GameService gameService;
+
     private final UserDAO userDataAccess;
     private final AuthDAO authDataAccess;
+    private final GameDAO gameDataAccess;
 
     public Server(){
         this.userDataAccess = new UserDataAccess();
         this.authDataAccess = new AuthDataAccess();
+        this.gameDataAccess = new GameDataAccess();
         this.userService = new UserService(userDataAccess,authDataAccess);
+        this.gameService = new GameService(userDataAccess,authDataAccess,gameDataAccess);
     }
 
 //    public Server(UserService service){
@@ -66,6 +71,11 @@ public class Server {
         return new Gson().toJson(registerResult);
     }
 
+    private Object clear(Request request, Response response) throws DataAccessException {
+        ClearResult clearResult = gameService.clear();
+        return new Gson().toJson(clearResult);
+    }
+
     private Object login(Request request, Response response) {
         return null;
     }
@@ -86,9 +96,7 @@ public class Server {
         return null;
     }
 
-    private Object clear(Request request, Response response) {
-        return null;
-    }
+
 
     //questions:
     // how to pass in authToken - the header gets passed in? how is the body passed in, through the request?
