@@ -79,7 +79,6 @@ public class Server {
     private Object login(Request request, Response response) throws DataAccessException{
         LoginRequest loginRequest = new Gson().fromJson(request.body(), LoginRequest.class);
         LoginResult loginResult = userService.login(loginRequest);
-        System.out.println("auth after login: " + loginResult.authToken());
         return new Gson().toJson(loginResult);
     }
 

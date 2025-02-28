@@ -46,13 +46,18 @@ public class UserService {
         //UserData myUser = new UserData(loginRequest.username(), loginRequest.password());
 
         UserData currUser = userDataAccess.getUser(loginRequest.username());
-        String expectedPassword = currUser.password();
+        if(currUser != null){
+            String expectedPassword = currUser.password();
 
-        if (loginRequest.password().equals(expectedPassword)) {
-            String authToken = AuthService.generateToken();
-            LoginResult result = new LoginResult(loginRequest.username(), authToken);
-            //need to make an AuthData object and call createAuth() ??
-            return result;
+            if (loginRequest.password().equals(expectedPassword)) {
+                String authToken = AuthService.generateToken();
+                LoginResult result = new LoginResult(loginRequest.username(), authToken);
+                //need to make an AuthData object and call createAuth() ??
+                return result;
+            }
+            else{
+                throw new DataAccessException(401, "Error: unauthorized");
+            }
         }
         else{
             throw new DataAccessException(401, "Error: unauthorized");
@@ -60,10 +65,17 @@ public class UserService {
     }
 
     public void logout(String authToken) throws DataAccessException {
-        if(authToken != null && !authToken.isEmpty()){
-            authDataAccess.deleteAuth(authToken);
+        try{
+            AuthData data = authDataAccess.getAuth(authToken);
+
+            if(data.authToken() != null && !authToken.isEmpty()){
+                authDataAccess.deleteAuth(authToken);
+            }
+            else{
+                throw new DataAccessException(401, "Error: unauthorized");
+            }
         }
-        else{
+        catch (Exception e) {
             throw new DataAccessException(401, "Error: unauthorized");
         }
     }
