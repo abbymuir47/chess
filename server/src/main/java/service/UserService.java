@@ -4,6 +4,8 @@ import dataaccess.*;
 import handlermodel.*;
 import model.*;
 
+import java.util.Objects;
+
 
 public class UserService {
 
@@ -39,6 +41,35 @@ public class UserService {
     public void clear() throws DataAccessException {
         userDataAccess.clearUserDAO();
     }
-//    public LoginResult login(LoginRequest loginRequest) {}
-//    public void logout(LogoutRequest logoutRequest) {}
+    public LoginResult login(LoginRequest loginRequest) throws DataAccessException {
+        //UserData myUser = new UserData(loginRequest.username(), loginRequest.password());
+
+        UserData currUser = userDataAccess.getUser(loginRequest.username());
+        String expectedPassword = currUser.password();
+
+        if (loginRequest.password().equals(expectedPassword)) {
+            String authToken = AuthService.generateToken();
+            LoginResult result = new LoginResult(loginRequest.username(), authToken);
+            return result;
+        }
+        else{
+            throw new DataAccessException(401, "Error: unauthorized");
+        }
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+        UserService that = (UserService) o;
+        return Objects.equals(userDataAccess, that.userDataAccess) && Objects.equals(authDataAccess, that.authDataAccess);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(userDataAccess, authDataAccess);
+    }
+
+    //    public void logout(LogoutRequest logoutRequest) {}
 }

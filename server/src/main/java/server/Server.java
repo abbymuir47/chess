@@ -82,8 +82,10 @@ public class Server {
         return "";
     }
 
-    private Object login(Request request, Response response) {
-        return null;
+    private Object login(Request request, Response response) throws DataAccessException{
+        LoginRequest loginRequest = new Gson().fromJson(request.body(), LoginRequest.class);
+        LoginResult loginResult = userService.login(loginRequest);
+        return new Gson().toJson(loginResult);
     }
 
     private Object logout(Request request, Response response) {
