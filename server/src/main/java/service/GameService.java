@@ -1,6 +1,8 @@
 package service;
 
 import dataaccess.*;
+import handlermodel.ListResult;
+import model.AuthData;
 
 
 public class GameService {
@@ -17,6 +19,23 @@ public class GameService {
 
     public void clear() throws DataAccessException {
         gameDataAccess.clearGameDAO();
+    }
+
+    public ListResult listgames(String authToken) throws DataAccessException {
+        try{
+            AuthData data = authDataAccess.getAuth(authToken);
+
+            if(data.authToken() != null && !authToken.isEmpty()){
+                ListResult result = new ListResult(gameDataAccess.listGames());
+                return result;
+            }
+            else{
+                throw new DataAccessException(401, "Error: unauthorized");
+            }
+        }
+        catch (Exception e) {
+            throw new DataAccessException(401, "Error: unauthorized");
+        }
     }
 
 //    public LoginResult login(LoginRequest loginRequest) {}

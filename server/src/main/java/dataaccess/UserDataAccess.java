@@ -25,9 +25,4 @@ public class UserDataAccess implements UserDAO {
     public void clearUserDAO() throws DataAccessException{
         users.clear();
     }
-    /*
-    public void deletePet(Integer id) {
-        pets.remove(id);
-    }
-     */
 }

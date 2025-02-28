@@ -88,8 +88,10 @@ public class Server {
         return "";
     }
 
-    private Object listGames(Request request, Response response) {
-        return null;
+    private Object listGames(Request request, Response response) throws DataAccessException {
+        String authToken = request.headers("authorization");
+        ListResult listResult = gameService.listgames(authToken);
+        return listResult;
     }
 
     private Object createGame(Request request, Response response) {
