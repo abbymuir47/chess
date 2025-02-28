@@ -9,7 +9,7 @@ public class AuthDataAccess implements AuthDAO {
 
     private HashMap<String, AuthData> auths = new HashMap<>();
 
-    //public AuthData getAuth(String username) {return auths.get(username);}
+    public AuthData getAuth(String authToken) throws DataAccessException {return auths.get(authToken);}
 
     @Override
     public AuthData createAuth(AuthData auth) {
@@ -21,5 +21,9 @@ public class AuthDataAccess implements AuthDAO {
     @Override
     public void clearAuthDAO() throws DataAccessException{
         auths.clear();
+    }
+
+    public void deleteAuth(String authToken) throws DataAccessException{
+        auths.remove(authToken);
     }
 }

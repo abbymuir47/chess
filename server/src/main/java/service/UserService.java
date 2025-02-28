@@ -41,6 +41,7 @@ public class UserService {
     public void clear() throws DataAccessException {
         userDataAccess.clearUserDAO();
     }
+
     public LoginResult login(LoginRequest loginRequest) throws DataAccessException {
         //UserData myUser = new UserData(loginRequest.username(), loginRequest.password());
 
@@ -50,12 +51,23 @@ public class UserService {
         if (loginRequest.password().equals(expectedPassword)) {
             String authToken = AuthService.generateToken();
             LoginResult result = new LoginResult(loginRequest.username(), authToken);
+            //need to make an AuthData object and call createAuth() ??
             return result;
         }
         else{
             throw new DataAccessException(401, "Error: unauthorized");
         }
     }
+
+    public void logout(String authToken) throws DataAccessException {
+        if(authToken != null && !authToken.isEmpty()){
+            authDataAccess.deleteAuth(authToken);
+        }
+        else{
+            throw new DataAccessException(401, "Error: unauthorized");
+        }
+    }
+
 
     @Override
     public boolean equals(Object o) {
@@ -70,6 +82,4 @@ public class UserService {
     public int hashCode() {
         return Objects.hash(userDataAccess, authDataAccess);
     }
-
-    //    public void logout(LogoutRequest logoutRequest) {}
 }

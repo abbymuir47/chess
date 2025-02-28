@@ -34,20 +34,14 @@ public class Server {
 
         // Register your endpoints and handle exceptions here.
 
-        // endpoint 1: register
         Spark.post("/user", this::register);
-        // endpoint 2: login
         Spark.post("/session", this::login);
-        // endpoint 3: logout
         Spark.delete("/session", this::logout);
-        // endpoint 4: list games
         Spark.get("/game", this::listGames);
-        // endpoint 5: create game
         Spark.post("/game", this::createGame);
-        // endpoint 6: join game
         Spark.put("/game", this::joinGame);
-        // endpoint 7: clear
         Spark.delete("/db", this::clear);
+
         Spark.exception(DataAccessException.class, this::exceptionHandler);
 
         //This line initializes the server and can be removed once you have a functioning endpoint 
@@ -85,11 +79,14 @@ public class Server {
     private Object login(Request request, Response response) throws DataAccessException{
         LoginRequest loginRequest = new Gson().fromJson(request.body(), LoginRequest.class);
         LoginResult loginResult = userService.login(loginRequest);
+        System.out.println("auth after login: " + loginResult.authToken());
         return new Gson().toJson(loginResult);
     }
 
-    private Object logout(Request request, Response response) {
-        return null;
+    private Object logout(Request request, Response response) throws DataAccessException {
+        String authToken = request.headers("authorization");
+        userService.logout(authToken);
+        return "";
     }
 
     private Object listGames(Request request, Response response) {

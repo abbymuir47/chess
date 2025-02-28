@@ -28,4 +28,16 @@ public class UnitTests {
         Assertions.assertNotNull(result.authToken(), "Response did not return authentication String");
     }
 
+    @Test
+    public void logoutTest() throws DataAccessException {
+        RegisterRequest newUser = new RegisterRequest("myUser", "myPassword", "myEmail");
+        RegisterResult result = userService.register(newUser);
+
+        String auth = result.authToken();
+
+        Assertions.assertEquals(newUser.username(), result.username(),
+                "Response did not give the same username as user");
+        Assertions.assertNotNull(result.authToken(), "Response did not return authentication String");
+    }
+
 }
