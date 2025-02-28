@@ -1,12 +1,8 @@
 package service;
 
 import dataaccess.*;
-import handlerModel.*;
+import handlermodel.*;
 import model.*;
-import org.eclipse.jetty.server.Authentication;
-
-import java.util.Collection;
-
 
 
 public class UserService {

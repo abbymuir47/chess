@@ -1,9 +1,5 @@
 package dataaccess;
-import handlerModel.*;
 import model.UserData;
-
-import javax.xml.crypto.Data;
-import java.util.Collection;
 
 public interface UserDAO {
     //see PetShop for example implementation of this!

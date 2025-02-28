@@ -1,8 +1,7 @@
 package service;
 
-import chess.ChessGame;
 import dataaccess.*;
-import handlerModel.*;
+import handlermodel.*;
 import org.junit.jupiter.api.*;
 
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)

@@ -3,9 +3,7 @@ package service;
 import dataaccess.AuthDAO;
 import dataaccess.DataAccessException;
 import dataaccess.UserDAO;
-import handlerModel.RegisterRequest;
-import handlerModel.RegisterResult;
-import model.UserData;
+
 import java.util.UUID;
 
 
