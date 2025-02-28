@@ -1,8 +1,9 @@
 package service;
 
+import chess.ChessGame;
 import dataaccess.*;
-import handlermodel.ListResult;
-import model.AuthData;
+import handlermodel.*;
+import model.*;
 
 
 public class GameService {
@@ -23,6 +24,15 @@ public class GameService {
 
     public ListResult listgames(String authToken) throws DataAccessException {
         ListResult result = new ListResult(gameDataAccess.listGames());
+        return result;
+    }
+
+    public CreateResult creategame(CreateRequest createRequest) throws DataAccessException {
+        int gameID = 1;
+        ChessGame chessGame = new ChessGame();
+        GameData game = new GameData(gameID, null, null, createRequest.gameName(), chessGame);
+        gameDataAccess.createGame(game);
+        CreateResult result = new CreateResult(gameID);
         return result;
     }
 

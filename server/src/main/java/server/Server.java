@@ -85,28 +85,24 @@ public class Server {
 
     private Object logout(Request request, Response response) throws DataAccessException {
         String authToken = request.headers("authorization");
-        if(checkAuth(authToken)){
-            userService.logout(authToken);
-            return "";
-        }
-        else{
-            throw new DataAccessException(401, "Error: unauthorized");
-        }
+        checkAuth(authToken);
+        userService.logout(authToken);
+        return "";
     }
 
     private Object listGames(Request request, Response response) throws DataAccessException {
         String authToken = request.headers("authorization");
-        if(checkAuth(authToken)){
-            ListResult listResult = gameService.listgames(authToken);
-            return listResult;
-        }
-        else{
-            throw new DataAccessException(401, "Error: unauthorized");
-        }
+        checkAuth(authToken);
+        ListResult listResult = gameService.listgames(authToken);
+        return new Gson().toJson(listResult);
     }
 
-    private Object createGame(Request request, Response response) {
-        return null;
+    private Object createGame(Request request, Response response) throws DataAccessException {
+        String authToken = request.headers("authorization");
+        checkAuth(authToken);
+        CreateRequest createRequest = new Gson().fromJson(request.body(), CreateRequest.class);
+        CreateResult createResult = gameService.creategame(createRequest);
+        return new Gson().toJson(createResult);
     }
 
     private Object joinGame(Request request, Response response) {

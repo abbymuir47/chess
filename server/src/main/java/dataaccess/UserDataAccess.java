@@ -16,7 +16,6 @@ public class UserDataAccess implements UserDAO {
 
     @Override
     public UserData createUser(UserData user) {
-        //UserData myUser = new UserData(user.username(), user.password(), user.email());
         users.put(user.username(), user);
         return user;
     }
