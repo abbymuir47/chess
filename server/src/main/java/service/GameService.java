@@ -22,20 +22,8 @@ public class GameService {
     }
 
     public ListResult listgames(String authToken) throws DataAccessException {
-        try{
-            AuthData data = authDataAccess.getAuth(authToken);
-
-            if(data.authToken() != null && !authToken.isEmpty()){
-                ListResult result = new ListResult(gameDataAccess.listGames());
-                return result;
-            }
-            else{
-                throw new DataAccessException(401, "Error: unauthorized");
-            }
-        }
-        catch (Exception e) {
-            throw new DataAccessException(401, "Error: unauthorized");
-        }
+        ListResult result = new ListResult(gameDataAccess.listGames());
+        return result;
     }
 
 //    public LoginResult login(LoginRequest loginRequest) {}

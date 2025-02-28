@@ -5,6 +5,7 @@ import com.google.gson.Gson;
 import dataaccess.*;
 import handlermodel.*;
 
+import model.AuthData;
 import service.*;
 import spark.*;
 
@@ -84,14 +85,24 @@ public class Server {
 
     private Object logout(Request request, Response response) throws DataAccessException {
         String authToken = request.headers("authorization");
-        userService.logout(authToken);
-        return "";
+        if(checkAuth(authToken)){
+            userService.logout(authToken);
+            return "";
+        }
+        else{
+            throw new DataAccessException(401, "Error: unauthorized");
+        }
     }
 
     private Object listGames(Request request, Response response) throws DataAccessException {
         String authToken = request.headers("authorization");
-        ListResult listResult = gameService.listgames(authToken);
-        return listResult;
+        if(checkAuth(authToken)){
+            ListResult listResult = gameService.listgames(authToken);
+            return listResult;
+        }
+        else{
+            throw new DataAccessException(401, "Error: unauthorized");
+        }
     }
 
     private Object createGame(Request request, Response response) {
@@ -103,10 +114,23 @@ public class Server {
     }
 
 
+    public boolean checkAuth (String authToken) throws DataAccessException {
+        try{
+            AuthData data = authDataAccess.getAuth(authToken);
+            if(data.authToken() != null && !authToken.isEmpty()){
+                return true;
+            }
+            else{
+                throw new DataAccessException(401, "Error: unauthorized");
+            }
+        }
+        catch (Exception e) {
+            throw new DataAccessException(401, "Error: unauthorized");
+        }
+    }
 
-    //questions:
-    // how to pass in authToken - the header gets passed in? how is the body passed in, through the request?
-    // where / how to create authToken - in the handler? no prob not till the service
+
+
     // Spark.exception - would be wise to create multiple exceptions
     // Spark.awaitInitialization()
 
