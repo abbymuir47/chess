@@ -43,7 +43,6 @@ public class UserService {
     }
 
     public LoginResult login(LoginRequest loginRequest) throws DataAccessException {
-        //UserData myUser = new UserData(loginRequest.username(), loginRequest.password());
 
         UserData currUser = userDataAccess.getUser(loginRequest.username());
         if(currUser != null){

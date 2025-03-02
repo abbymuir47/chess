@@ -105,8 +105,14 @@ public class Server {
         return new Gson().toJson(createResult);
     }
 
-    private Object joinGame(Request request, Response response) {
-        return null;
+    private Object joinGame(Request request, Response response) throws DataAccessException {
+        String authToken = request.headers("authorization");
+        checkAuth(authToken);
+        String currUsername = getUsername(authToken);
+
+        JoinRequest joinRequest = new Gson().fromJson(request.body(), JoinRequest.class);
+        gameService.joingame(joinRequest, currUsername);
+        return "";
     }
 
 
@@ -123,6 +129,12 @@ public class Server {
         catch (Exception e) {
             throw new DataAccessException(401, "Error: unauthorized");
         }
+    }
+
+    public String getUsername(String authToken) throws DataAccessException {
+        checkAuth(authToken);
+        AuthData auth = authDataAccess.getAuth(authToken);
+        return auth.username();
     }
 
 

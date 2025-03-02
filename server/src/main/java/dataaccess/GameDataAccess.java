@@ -12,7 +12,7 @@ public class GameDataAccess implements GameDAO {
 
     @Override
     public GameData getGame(int gameID) throws DataAccessException {
-        return null;
+        return games.get(gameID);
     }
 
     @Override
@@ -23,7 +23,8 @@ public class GameDataAccess implements GameDAO {
 
     @Override
     public GameData updateGame(GameData game) throws DataAccessException {
-        return null;
+        games.put(game.gameID(), game);
+        return game;
     }
 
     @Override
