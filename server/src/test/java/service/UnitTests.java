@@ -24,7 +24,7 @@ public class UnitTests {
     }
 
     @Test
-    public void registerTest() throws DataAccessException {
+    public void registerTestSuccess() throws DataAccessException {
         RegisterRequest newUser = new RegisterRequest("myUser", "myPassword", "myEmail");
         RegisterResult result = userService.register(newUser);
 
@@ -33,29 +33,33 @@ public class UnitTests {
         Assertions.assertNotNull(result.authToken(), "Response did not return authentication String");
     }
 
+    /*
     @Test
-    public void joingameTest() throws DataAccessException {
-        RegisterRequest newUser = new RegisterRequest("ExistingUser", "myPassword", "myEmail");
+    public void registerTestFail() throws DataAccessException {
+        RegisterRequest newUser = new RegisterRequest("myUser", null, "myEmail");
         RegisterResult result = userService.register(newUser);
-        String existingAuth = result.authToken();
 
-        ChessGame chessGame = new ChessGame();
-        GameData game = new GameData(1, null, "taken", "myGame", chessGame);
+        Assertions.assertEquals(newUser.username(), result.username(),
+                "Response did not give the same username as user");
+        Assertions.assertNotNull(result.authToken(), "Response did not return authentication String");
+    }
+     */
 
-        CreateRequest createRequest = new CreateRequest("myGame");
-        gameService.creategame(createRequest);
+    @Test
+    public void loginSuccess() throws DataAccessException {
+        RegisterRequest newUser = new RegisterRequest("myUser", "myPassword", "myEmail");
+        userService.register(newUser);
 
-        JoinRequest req = new JoinRequest("WHITE", 1);
-        gameService.joingame(req, "ExistingUser");
+        LoginRequest req = new LoginRequest("myUser", "myPassword");
+        LoginResult result = userService.login(req);
 
-        ListResult listResult = gameService.listgames(existingAuth);
-
-        System.out.println(listResult);
-        //System.out.println(listResult.getGames()[0].getWhiteUsername());
+        Assertions.assertEquals(newUser.password(), req.password(),
+                "Request did not give the same password as user");
+        Assertions.assertNotNull(result.authToken(), "Response did not return authentication String");
     }
 
     @Test
-    public void logoutTest() throws DataAccessException {
+    public void logoutSuccess() throws DataAccessException {
         RegisterRequest newUser = new RegisterRequest("myUser", "myPassword", "myEmail");
         RegisterResult result = userService.register(newUser);
 
@@ -65,5 +69,58 @@ public class UnitTests {
                 "Response did not give the same username as user");
         Assertions.assertNotNull(result.authToken(), "Response did not return authentication String");
     }
+
+    @Test
+    public void createGameSuccess() throws DataAccessException {
+        CreateRequest req = new CreateRequest("myGame");
+        gameService.creategame(req);
+    }
+
+    @Test
+    public void joingameSuccess() throws DataAccessException {
+        RegisterRequest newUser = new RegisterRequest("ExistingUser", "myPassword", "myEmail");
+        RegisterResult result = userService.register(newUser);
+        String existingAuth = result.authToken();
+
+        CreateRequest createRequest = new CreateRequest("myGame");
+        gameService.creategame(createRequest);
+
+        JoinRequest req = new JoinRequest("WHITE", 1);
+        gameService.joingame(req, "ExistingUser");
+    }
+
+    @Test
+    public void listGamesSuccess() throws DataAccessException {
+        RegisterRequest newUser = new RegisterRequest("ExistingUser", "myPassword", "myEmail");
+        RegisterResult result = userService.register(newUser);
+
+        gameService.listgames(result.authToken());
+    }
+
+    @Test
+    public void clearTest() throws DataAccessException {
+        userService.clear();
+        authService.clear();
+        gameService.clear();
+    }
+
+    /*
+    @Test
+    public void joingameFail() throws DataAccessException {
+        RegisterRequest newUser = new RegisterRequest("ExistingUser", "myPassword", "myEmail");
+        RegisterResult result = userService.register(newUser);
+        String existingAuth = result.authToken();
+
+       CreateRequest createRequest = new CreateRequest("myGame");
+        gameService.creategame(createRequest);
+
+        JoinRequest req = new JoinRequest("BLACK", 1);
+        gameService.joingame(req, "ExistingUser");
+
+        JoinRequest secondReq = new JoinRequest("BLACK", 1);
+        gameService.joingame(req, "NewUser");
+    }
+
+     */
 
 }

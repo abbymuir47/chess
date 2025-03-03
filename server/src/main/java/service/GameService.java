@@ -7,9 +7,6 @@ import model.*;
 
 import java.util.ArrayList;
 
-import static chess.ChessGame.TeamColor.WHITE;
-
-
 public class GameService {
 
     private final UserDAO userDataAccess;
@@ -74,9 +71,4 @@ public class GameService {
             throw new DataAccessException(400, "Error: bad request");
         }
     }
-
-
-
-//    public LoginResult login(LoginRequest loginRequest) {}
-//    public void logout(LogoutRequest logoutRequest) {}
 }

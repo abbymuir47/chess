@@ -24,6 +24,4 @@ public class AuthService {
     public void clear() throws DataAccessException {
         authDataAccess.clearAuthDAO();
     }
-//    public LoginResult login(LoginRequest loginRequest) {}
-//    public void logout(LogoutRequest logoutRequest) {}
 }
