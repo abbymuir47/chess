@@ -5,6 +5,8 @@ import dataaccess.*;
 import handlermodel.*;
 import model.*;
 
+import java.util.ArrayList;
+
 import static chess.ChessGame.TeamColor.WHITE;
 
 
@@ -25,7 +27,7 @@ public class GameService {
     }
 
     public ListResult listgames(String authToken) throws DataAccessException {
-        ListResult result = new ListResult(gameDataAccess.listGames());
+        ListResult result = new ListResult((ArrayList<GameData>) gameDataAccess.listGames());
         return result;
     }
 

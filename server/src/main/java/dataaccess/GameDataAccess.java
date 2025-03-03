@@ -28,7 +28,7 @@ public class GameDataAccess implements GameDAO {
     }
 
     @Override
-    public List<GameData> listGames() throws DataAccessException {
+    public ArrayList<GameData> listGames() throws DataAccessException {
         return new ArrayList<>(games.values());
     }
 
