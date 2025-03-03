@@ -68,7 +68,12 @@ public class UserService {
     }
 
     public void logout(String authToken) throws DataAccessException {
-        authDataAccess.deleteAuth(authToken);
+        if(authToken != null){
+            authDataAccess.deleteAuth(authToken);
+        }
+        else{
+            throw new DataAccessException(401, "Error: unauthorized");
+        }
     }
 
 
