@@ -33,7 +33,6 @@ public class UnitTests {
         Assertions.assertNotNull(result.authToken(), "Response did not return authentication String");
     }
 
-    /*
     @Test
     public void registerTestFail() throws DataAccessException {
         RegisterRequest newUser = new RegisterRequest("myUser", null, "myEmail");
@@ -43,7 +42,6 @@ public class UnitTests {
                 "Response did not give the same username as user");
         Assertions.assertNotNull(result.authToken(), "Response did not return authentication String");
     }
-     */
 
     @Test
     public void loginSuccess() throws DataAccessException {
