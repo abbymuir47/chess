@@ -51,7 +51,11 @@ public class UserService {
             if (loginRequest.password().equals(expectedPassword)) {
                 String authToken = AuthService.generateToken();
                 LoginResult result = new LoginResult(loginRequest.username(), authToken);
+
                 //need to make an AuthData object and call createAuth() ??
+                AuthData myAuth = new AuthData(authToken, loginRequest.username());
+                AuthData auth = authDataAccess.createAuth(myAuth);
+
                 return result;
             }
             else{

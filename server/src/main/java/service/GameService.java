@@ -32,35 +32,43 @@ public class GameService {
     }
 
     public CreateResult creategame(CreateRequest createRequest) throws DataAccessException {
-        int gameID = 1;
         ChessGame chessGame = new ChessGame();
-        GameData game = new GameData(gameID, null, null, createRequest.gameName(), chessGame);
-        gameDataAccess.createGame(game);
-        CreateResult result = new CreateResult(gameID);
+        GameData game = new GameData(0, null, null, createRequest.gameName(), chessGame);
+        GameData insertedGame = gameDataAccess.createGame(game);
+        CreateResult result = new CreateResult(insertedGame.gameID());
         return result;
     }
 
     public void joingame(JoinRequest joinRequest, String username) throws DataAccessException {
         GameData game = gameDataAccess.getGame(joinRequest.gameID());
+        GameData updatedGame;
+
         if(game != null){
-            ChessGame.TeamColor color = joinRequest.color();
-            if(color == ChessGame.TeamColor.WHITE){
+
+            if(joinRequest.playerColor()==null){
+                throw new DataAccessException(400, "Error: bad request");
+            }
+
+            if(joinRequest.playerColor().equals("WHITE")){
                 if(game.whiteUsername() == null){
-                    game = new GameData(game.gameID(), username, game.blackUsername(), game.gameName(), game.game());
+                    updatedGame = new GameData(game.gameID(), username, game.blackUsername(), game.gameName(), game.game());
                 }
                 else{
                     throw new DataAccessException(403, "Error: white color already taken");
                 }
             }
-            else {
+            else if(joinRequest.playerColor().equals("BLACK")){
                 if(game.blackUsername() == null){
-                    game = new GameData(game.gameID(), game.whiteUsername(), username, game.gameName(), game.game());
+                    updatedGame = new GameData(game.gameID(), game.whiteUsername(), username, game.gameName(), game.game());
                 }
                 else{
                     throw new DataAccessException(403, "Error: black color already taken");
                 }
             }
-            gameDataAccess.updateGame(game);
+            else{
+                throw new DataAccessException(400, "Error: bad request");
+            }
+            gameDataAccess.updateGame(updatedGame);
         }
         else{
             throw new DataAccessException(400, "Error: bad request");

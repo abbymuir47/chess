@@ -45,7 +45,7 @@ public class UnitTests {
         CreateRequest createRequest = new CreateRequest("myGame");
         gameService.creategame(createRequest);
 
-        JoinRequest req = new JoinRequest(WHITE, 1);
+        JoinRequest req = new JoinRequest("WHITE", 1);
         gameService.joingame(req, "ExistingUser");
 
         ListResult listResult = gameService.listgames(existingAuth);

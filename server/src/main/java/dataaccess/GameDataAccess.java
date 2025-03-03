@@ -3,10 +3,12 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
+import chess.ChessGame;
 import model.GameData;
 
 public class GameDataAccess implements GameDAO {
 
+    private int nextId = 1;
     private HashMap<Integer, GameData> games = new HashMap<>();
 
 
@@ -17,6 +19,8 @@ public class GameDataAccess implements GameDAO {
 
     @Override
     public GameData createGame(GameData game) throws DataAccessException {
+        game = new GameData(nextId++, null, null, game.gameName(), new ChessGame());
+
         games.put(game.gameID(), game);
         return game;
     }
