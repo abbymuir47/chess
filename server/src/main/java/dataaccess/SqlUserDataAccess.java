@@ -15,8 +15,8 @@ public class SqlUserDataAccess implements UserDAO{
                 preparedStatement.setString(1, username);
                 var rs = preparedStatement.executeQuery();  // Executes the query
                 if (rs.next()) {
-                    System.out.println("Username: " + rs.getString("username"));
-                    System.out.println("Email: " + rs.getString("email"));
+                    //System.out.println("Username: " + rs.getString("username"));
+                    //System.out.println("Email: " + rs.getString("email"));
                     myUser = new UserData(rs.getString("username"), null, rs.getString("email"));
                     return myUser;
                 }
@@ -32,7 +32,7 @@ public class SqlUserDataAccess implements UserDAO{
     @Override
     public UserData createUser(UserData user) throws SQLException {
         String query = "INSERT INTO user (username, password, email) VALUES (?, ?, ?)";
-        System.out.println("in create user");
+        //System.out.println("in create user");
         try (var conn = DatabaseManager.getConnection()) {
             try (var preparedStatement = conn.prepareStatement(query)) {
                 preparedStatement.setString(1, user.username());
@@ -48,6 +48,16 @@ public class SqlUserDataAccess implements UserDAO{
 
     @Override
     public void clearUserDAO() throws DataAccessException {
-
+        String query = "TRUNCATE TABLE user";
+        try (var conn = DatabaseManager.getConnection()) {
+            try (var preparedStatement = conn.prepareStatement(query)) {
+                preparedStatement.executeUpdate();
+            }
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+        catch (DataAccessException e) {
+            throw new RuntimeException(e);
+        }
     }
 }
