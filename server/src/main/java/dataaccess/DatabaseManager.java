@@ -22,30 +22,24 @@ public class DatabaseManager {
     """,
     """
     CREATE TABLE IF NOT EXISTS game (
-      `id` int NOT NULL AUTO_INCREMENT,
+      `gameID` int NOT NULL,
       `whiteUsername` varchar(256) NOT NULL,
       `blackUsername` varchar(256) NOT NULL,
       `game_name` varchar(256) NOT NULL,
       `game_data` TEXT,
-      PRIMARY KEY (`id`),
-      FOREIGN KEY (`whiteUsername`) REFERENCES user(`username`),
-      FOREIGN KEY (`blackUsername`) REFERENCES user(`username`)
+      PRIMARY KEY (`gameID`)
     ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci
     """,
     """
     CREATE TABLE IF NOT EXISTS auth (
       `authToken` varchar(256) NOT NULL,
       `username` varchar(256) NOT NULL,
-      PRIMARY KEY (`authToken`),
-      FOREIGN KEY (`username`) REFERENCES user(`username`)
+      PRIMARY KEY (`authToken`)
     ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci
     """
     };
 
-
-    /*
-     * Load the database information for the db.properties file.
-     */
+    //Load the database information for the db.properties file.
     static {
         try {
             try (var propStream = Thread.currentThread().getContextClassLoader().getResourceAsStream("db.properties")) {
@@ -67,9 +61,6 @@ public class DatabaseManager {
         }
     }
 
-    /**
-     * Creates the database if it does not already exist.
-     */
     static void createDatabase() throws DataAccessException {
         try {
             var statement = "CREATE DATABASE IF NOT EXISTS " + DATABASE_NAME;
@@ -83,6 +74,7 @@ public class DatabaseManager {
 
     }
 
+    //adds tables to database
     public void configureDatabase() throws DataAccessException {
         createDatabase();  // Ensure the database exists
 
@@ -98,19 +90,6 @@ public class DatabaseManager {
         }
     }
 
-
-    /**
-     * Create a connection to the database and sets the catalog based upon the
-     * properties specified in db.properties. Connections to the database should
-     * be short-lived, and you must close the connection when you are done with it.
-     * The easiest way to do that is with a try-with-resource block.
-     * <br/>
-     * <code>
-     * try (var conn = DbInfo.getConnection(databaseName)) {
-     * // execute SQL statements.
-     * }
-     * </code>
-     */
     static Connection getConnection() throws DataAccessException {
         try {
             var conn = DriverManager.getConnection(CONNECTION_URL, USER, PASSWORD);
