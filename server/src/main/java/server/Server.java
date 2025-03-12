@@ -9,6 +9,8 @@ import model.AuthData;
 import service.*;
 import spark.*;
 
+import java.sql.SQLException;
+
 public class Server {
 
     private final UserService userService;
@@ -20,9 +22,9 @@ public class Server {
     private final GameDAO gameDataAccess;
 
     public Server(){
-        this.userDataAccess = new UserDataAccess();
-        this.authDataAccess = new AuthDataAccess();
-        this.gameDataAccess = new GameDataAccess();
+        this.userDataAccess = new MemoryUserDataAccess();
+        this.authDataAccess = new MemoryAuthDataAccess();
+        this.gameDataAccess = new MemoryGameDataAccess();
         this.userService = new UserService(userDataAccess,authDataAccess);
         this.authService = new AuthService(userDataAccess,authDataAccess);
         this.gameService = new GameService(userDataAccess,authDataAccess,gameDataAccess);
@@ -64,7 +66,7 @@ public class Server {
         res.body(new Gson().toJson(message));
     }
 
-    private Object register(Request request, Response response) throws DataAccessException {
+    private Object register(Request request, Response response) throws DataAccessException, SQLException {
         RegisterRequest registerRequest = new Gson().fromJson(request.body(), RegisterRequest.class);
         RegisterResult registerResult = userService.register(registerRequest);
         return new Gson().toJson(registerResult);
@@ -77,7 +79,7 @@ public class Server {
         return "";
     }
 
-    private Object login(Request request, Response response) throws DataAccessException{
+    private Object login(Request request, Response response) throws DataAccessException, SQLException {
         LoginRequest loginRequest = new Gson().fromJson(request.body(), LoginRequest.class);
         LoginResult loginResult = userService.login(loginRequest);
         return new Gson().toJson(loginResult);

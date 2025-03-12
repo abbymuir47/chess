@@ -1,31 +1,28 @@
 package service;
 
-import chess.ChessGame;
 import dataaccess.*;
 import handlermodel.*;
-import model.GameData;
 import org.junit.jupiter.api.*;
 import org.opentest4j.AssertionFailedError;
-import passoff.model.TestListResult;
 
-import static chess.ChessGame.TeamColor.WHITE;
+import java.sql.SQLException;
 
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 public class UnitTests {
 
-    UserDataAccess userDataAccess = new UserDataAccess();
-    AuthDataAccess authDataAccess = new AuthDataAccess();
-    GameDataAccess gameDataAccess = new GameDataAccess();
-    UserService userService = new UserService(userDataAccess,authDataAccess);
-    AuthService authService = new AuthService(userDataAccess,authDataAccess);
-    GameService gameService = new GameService(userDataAccess,authDataAccess,gameDataAccess);
+    MemoryUserDataAccess memoryUserDataAccess = new MemoryUserDataAccess();
+    MemoryAuthDataAccess memoryAuthDataAccess = new MemoryAuthDataAccess();
+    MemoryGameDataAccess memoryGameDataAccess = new MemoryGameDataAccess();
+    UserService userService = new UserService(memoryUserDataAccess, memoryAuthDataAccess);
+    AuthService authService = new AuthService(memoryUserDataAccess, memoryAuthDataAccess);
+    GameService gameService = new GameService(memoryUserDataAccess, memoryAuthDataAccess, memoryGameDataAccess);
 
     @BeforeAll
     public static void init() {
     }
 
     @Test
-    public void registerTestSuccess() throws DataAccessException {
+    public void registerTestSuccess() throws DataAccessException, SQLException {
         RegisterRequest newUser = new RegisterRequest("myUser", "myPassword", "myEmail");
         RegisterResult result = userService.register(newUser);
 
@@ -45,7 +42,7 @@ public class UnitTests {
     }
 
     @Test
-    public void loginSuccess() throws DataAccessException {
+    public void loginSuccess() throws DataAccessException, SQLException {
         RegisterRequest newUser = new RegisterRequest("myUser", "myPassword", "myEmail");
         userService.register(newUser);
 
@@ -58,7 +55,7 @@ public class UnitTests {
     }
 
     @Test
-    public void loginFail() throws DataAccessException {
+    public void loginFail() throws DataAccessException, SQLException {
         RegisterRequest newUser = new RegisterRequest("myUser", "myPassword", "myEmail");
         userService.register(newUser);
 
@@ -71,7 +68,7 @@ public class UnitTests {
     }
 
     @Test
-    public void logoutSuccess() throws DataAccessException {
+    public void logoutSuccess() throws DataAccessException, SQLException {
         RegisterRequest newUser = new RegisterRequest("myUser", "myPassword", "myEmail");
         RegisterResult result = userService.register(newUser);
 
@@ -110,7 +107,7 @@ public class UnitTests {
     }
 
     @Test
-    public void joingameSuccess() throws DataAccessException {
+    public void joingameSuccess() throws DataAccessException, SQLException {
         RegisterRequest newUser = new RegisterRequest("ExistingUser", "myPassword", "myEmail");
         RegisterResult result = userService.register(newUser);
         String existingAuth = result.authToken();
@@ -123,7 +120,7 @@ public class UnitTests {
     }
 
     @Test
-    public void joingameFail() throws DataAccessException {
+    public void joingameFail() throws DataAccessException, SQLException {
         RegisterRequest newUser = new RegisterRequest("ExistingUser", "myPassword", "myEmail");
         RegisterResult result = userService.register(newUser);
         String existingAuth = result.authToken();
@@ -143,7 +140,7 @@ public class UnitTests {
     }
 
     @Test
-    public void listGamesSuccess() throws DataAccessException {
+    public void listGamesSuccess() throws DataAccessException, SQLException {
         RegisterRequest newUser = new RegisterRequest("whiteUser", "myPassword", "myEmail");
         RegisterResult user = userService.register(newUser);
 
@@ -159,7 +156,7 @@ public class UnitTests {
     }
 
     @Test
-    public void listGamesFail() throws DataAccessException {
+    public void listGamesFail() throws DataAccessException, SQLException {
         RegisterRequest newUser = new RegisterRequest("whiteUser", "myPassword", "myEmail");
         RegisterResult user = userService.register(newUser);
 

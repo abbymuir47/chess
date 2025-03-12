@@ -2,10 +2,9 @@ package dataaccess;
 
 import model.AuthData;
 
-import java.util.Collection;
 import java.util.HashMap;
 
-public class AuthDataAccess implements AuthDAO {
+public class MemoryAuthDataAccess implements AuthDAO {
 
     private HashMap<String, AuthData> auths = new HashMap<>();
 

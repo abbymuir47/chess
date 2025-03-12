@@ -4,6 +4,7 @@ import dataaccess.*;
 import handlermodel.*;
 import model.*;
 
+import java.sql.SQLException;
 import java.util.Objects;
 
 
@@ -17,7 +18,7 @@ public class UserService {
         this.authDataAccess = authDataAccess;
     }
 
-    public RegisterResult register(RegisterRequest registerRequest) throws DataAccessException {
+    public RegisterResult register(RegisterRequest registerRequest) throws DataAccessException, SQLException {
 
         if (registerRequest.username() == null || registerRequest.password() == null || registerRequest.email() == null) {
             throw new DataAccessException(400, "Error: bad request - all fields must be filled");
@@ -42,7 +43,7 @@ public class UserService {
         userDataAccess.clearUserDAO();
     }
 
-    public LoginResult login(LoginRequest loginRequest) throws DataAccessException {
+    public LoginResult login(LoginRequest loginRequest) throws DataAccessException, SQLException {
 
         UserData currUser = userDataAccess.getUser(loginRequest.username());
         if(currUser != null){
