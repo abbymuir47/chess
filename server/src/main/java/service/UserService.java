@@ -3,6 +3,7 @@ package service;
 import dataaccess.*;
 import handlermodel.*;
 import model.*;
+import org.mindrot.jbcrypt.BCrypt;
 
 import java.sql.SQLException;
 import java.util.Objects;
@@ -29,7 +30,10 @@ public class UserService {
             throw new DataAccessException(403, "Error: user already exists");
         }
         else{
-            UserData myUser = new UserData(registerRequest.username(), registerRequest.password(), registerRequest.email());
+            //create hashed password here:
+            String hashedPassword = BCrypt.hashpw(registerRequest.password(), BCrypt.gensalt());
+
+            UserData myUser = new UserData(registerRequest.username(), hashedPassword, registerRequest.email());
             userDataAccess.createUser(myUser);
             String authToken = AuthService.generateToken();
             AuthData myAuth = new AuthData(authToken, registerRequest.username());
@@ -47,9 +51,10 @@ public class UserService {
 
         UserData currUser = userDataAccess.getUser(loginRequest.username());
         if(currUser != null){
-            String expectedPassword = currUser.password();
+            String expectedHashedPassword = currUser.password();
+            boolean foundHashedPassword = BCrypt.checkpw(loginRequest.password(), expectedHashedPassword);
 
-            if (loginRequest.password().equals(expectedPassword)) {
+            if (foundHashedPassword) {
                 String authToken = AuthService.generateToken();
                 LoginResult result = new LoginResult(loginRequest.username(), authToken);
 
