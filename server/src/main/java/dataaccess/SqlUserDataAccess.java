@@ -21,9 +21,7 @@ public class SqlUserDataAccess implements UserDAO{
                     return myUser;
                 }
             }
-        } catch (SQLException e) {
-            throw new RuntimeException(e);
-        } catch (DataAccessException e) {
+        } catch (DataAccessException | SQLException e) {
             throw new RuntimeException(e);
         }
         return null;
@@ -53,10 +51,7 @@ public class SqlUserDataAccess implements UserDAO{
             try (var preparedStatement = conn.prepareStatement(query)) {
                 preparedStatement.executeUpdate();
             }
-        } catch (SQLException e) {
-            throw new RuntimeException(e);
-        }
-        catch (DataAccessException e) {
+        } catch (DataAccessException | SQLException e) {
             throw new RuntimeException(e);
         }
     }

@@ -107,7 +107,7 @@ public class Server {
         return new Gson().toJson(createResult);
     }
 
-    private Object joinGame(Request request, Response response) throws DataAccessException {
+    private Object joinGame(Request request, Response response) throws DataAccessException, SQLException {
         String authToken = request.headers("authorization");
         checkAuth(authToken);
         String currUsername = getUsername(authToken);
@@ -133,7 +133,7 @@ public class Server {
         }
     }
 
-    public String getUsername(String authToken) throws DataAccessException {
+    public String getUsername(String authToken) throws DataAccessException, SQLException {
         checkAuth(authToken);
         AuthData auth = authDataAccess.getAuth(authToken);
         return auth.username();

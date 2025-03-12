@@ -42,4 +42,52 @@ public class DatabaseUnitTests {
         sqlUserDataAccess.clearUserDAO();
     }
 
+    @Test
+    public void createAuthSuccess() throws DataAccessException, SQLException {
+        AuthData newAuth = new AuthData("authToken123", "user1");
+
+        // Creating the AuthData entry
+        AuthData createdAuth = sqlAuthDataAccess.createAuth(newAuth);
+        System.out.println("Auth created: " + createdAuth);
+
+        // Retrieving the created AuthData to ensure it's stored
+        AuthData retrievedAuth = sqlAuthDataAccess.getAuth("authToken123");
+        System.out.println("Retrieved auth: " + retrievedAuth);
+
+        // Assertions
+        Assertions.assertNotNull("Auth should be created", String.valueOf(createdAuth)); // Check if creation was successful
+        Assertions.assertNotNull("Auth should be retrieved", String.valueOf(retrievedAuth)); // Check if the AuthData is retrieved
+        Assertions.assertEquals("authToken123", retrievedAuth.authToken()); // Ensure the authToken matches
+    }
+
+    @Test
+    public void getAuthSuccess() throws DataAccessException, SQLException {
+        AuthData newAuth = new AuthData("authToken123", "user1");
+
+        sqlAuthDataAccess.createAuth(newAuth);
+
+        AuthData retrievedAuth = sqlAuthDataAccess.getAuth("authToken123");
+        System.out.println("Retrieved auth: " + retrievedAuth);
+
+        Assertions.assertNotNull("Auth should be retrieved", String.valueOf(retrievedAuth)); // Check if the AuthData is retrieved
+        Assertions.assertEquals("authToken123", retrievedAuth.authToken()); // Ensure the authToken matches
+        Assertions.assertEquals("user1", retrievedAuth.username()); // Ensure the username matches
+    }
+
+    @Test
+    public void deleteAuthSuccess() throws DataAccessException, SQLException {
+        AuthData newAuth = new AuthData("authTokenDeleteTest", "userDeleteTest");
+        sqlAuthDataAccess.createAuth(newAuth);
+        sqlAuthDataAccess.deleteAuth("authTokenDeleteTest");
+
+        AuthData retrievedAuth = sqlAuthDataAccess.getAuth("authTokenDeleteTest");
+
+        Assertions.assertNull(retrievedAuth, "Auth should be deleted"); // Check if retrievedAuth is null
+    }
+
+    @Test
+    public void clearAuthSuccess() throws SQLException, DataAccessException {
+        sqlAuthDataAccess.clearAuthDAO();
+    }
+
 }
