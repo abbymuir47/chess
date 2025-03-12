@@ -22,7 +22,6 @@ public class DatabaseUnitTests {
     public static void init() {
     }
 
-
     @Test
     public void createUserSuccess() throws SQLException{
         UserData newUser = new UserData("myUser", "myPassword", "myEmail");
