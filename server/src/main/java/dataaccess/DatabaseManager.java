@@ -9,6 +9,41 @@ public class DatabaseManager {
     private static final String PASSWORD;
     private static final String CONNECTION_URL;
 
+    private final String[] createTables = {
+    """
+    CREATE TABLE IF NOT EXISTS user (
+      `id` int NOT NULL AUTO_INCREMENT,
+      `username` varchar(256) NOT NULL,
+      `password` varchar(256) NOT NULL,
+      `email` varchar(256) NOT NULL,
+      PRIMARY KEY (`id`),
+      UNIQUE (`username`),
+      INDEX (`username`)
+    ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci
+    """,
+    """
+    CREATE TABLE IF NOT EXISTS game (
+      `id` int NOT NULL AUTO_INCREMENT,
+      `whiteUsername` varchar(256) NOT NULL,
+      `blackUsername` varchar(256) NOT NULL,
+      `game_name` varchar(256) NOT NULL,
+      `game_data` TEXT,
+      PRIMARY KEY (`id`),
+      FOREIGN KEY (`whiteUsername`) REFERENCES user(`username`),
+      FOREIGN KEY (`blackUsername`) REFERENCES user(`username`)
+    ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci
+    """,
+    """
+    CREATE TABLE IF NOT EXISTS auth (
+      `authToken` varchar(256) NOT NULL,
+      `username` varchar(256) NOT NULL,
+      PRIMARY KEY (`authToken`),
+      FOREIGN KEY (`username`) REFERENCES user(`username`)
+    ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci
+    """
+    };
+
+
     /*
      * Load the database information for the db.properties file.
      */
@@ -46,7 +81,24 @@ public class DatabaseManager {
         } catch (SQLException e) {
             throw new DataAccessException(e.getMessage());
         }
+
     }
+
+    public void configureDatabase() throws DataAccessException {
+        createDatabase();  // Ensure the database exists
+
+        try (var conn = getConnection()) {
+            // Iterate over the createTable SQL statements and execute them
+            for (var statement : createTables) {
+                try (var preparedStatement = conn.prepareStatement(statement)) {
+                    preparedStatement.executeUpdate();
+                }
+            }
+        } catch (SQLException e) {
+            throw new DataAccessException("Unable to configure database: " + e.getMessage());
+        }
+    }
+
 
     /**
      * Create a connection to the database and sets the catalog based upon the
