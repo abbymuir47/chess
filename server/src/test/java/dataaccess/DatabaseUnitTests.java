@@ -155,7 +155,85 @@ public class DatabaseUnitTests {
     }
 
     @Test
+    public void createGameFail() throws SQLException, DataAccessException {
+        ChessGame chessGame = new ChessGame();
+
+        GameData game = new GameData(1000, null, null, "game1name", chessGame);
+        GameData newGame = sqlGameDataAccess.createGame(game);
+
+        GameData retrievedGame = sqlGameDataAccess.getGame(1000);
+
+        Assertions.assertNotNull("Game should be created", String.valueOf(newGame));
+        Assertions.assertNotNull("Game should be retrieved", String.valueOf(retrievedGame));
+        Assertions.assertEquals(retrievedGame.gameName(), "game1name", "game name didn't match");
+    }
+
+
+    @Test
+    public void updateGameSuccess() throws SQLException, DataAccessException {
+        ChessGame chessGame = new ChessGame();
+
+        GameData game = new GameData(1001, null, null, "game1name", chessGame);
+        GameData newGame = sqlGameDataAccess.createGame(game);
+
+        GameData updatedData = new GameData(1001, "newWhite", "newBlack", "newName", chessGame);
+        GameData updatedGame = sqlGameDataAccess.updateGame(updatedData);
+
+        Assertions.assertEquals(updatedData, updatedGame, "game did not update correctly");
+    }
+
+
+    @Test
+    public void updateGameFail() throws SQLException, DataAccessException {
+        ChessGame chessGame = new ChessGame();
+
+        GameData game = new GameData(3, null, null, "game1name", chessGame);
+        GameData newGame = sqlGameDataAccess.createGame(game);
+
+        GameData updatedData = new GameData(1, "newWhite", "newBlack", "newName", chessGame);
+        GameData updatedData2 = new GameData(4, "newWhite", "newBlack", "newName", chessGame);
+        GameData updatedGame = sqlGameDataAccess.updateGame(updatedData);
+
+        AssertionFailedError e = Assertions.assertThrows(AssertionFailedError.class, () ->
+                Assertions.assertEquals(updatedData2, updatedGame, "game did not update correctly"));
+    }
+
+    @Test
+    public void listGamesSuccess() throws DataAccessException, SQLException {
+        RegisterRequest newUser = new RegisterRequest("whiteUser", "myPassword", "myEmail");
+        RegisterResult user = userService.register(newUser);
+
+        CreateResult game1 = gameService.creategame(new CreateRequest("game1"));
+        CreateResult game2 = gameService.creategame(new CreateRequest("game2"));
+
+        ListResult result = gameService.listgames(user.authToken());
+
+        Assertions.assertEquals(result.games().getFirst().gameID(), 1,
+                "Response did not give the same gameID as expected");
+        Assertions.assertEquals(result.games().get(1).gameID(), 2,
+                "Response did not give the same gameID as expected");
+    }
+
+    @Test
+    public void listGamesFail() throws DataAccessException, SQLException {
+        RegisterRequest newUser = new RegisterRequest("whiteUser", "myPassword", "myEmail");
+        RegisterResult user = userService.register(newUser);
+
+        CreateResult game1 = gameService.creategame(new CreateRequest("game1"));
+        CreateResult game2 = gameService.creategame(new CreateRequest("game2"));
+
+        ListResult result = gameService.listgames(user.authToken());
+
+        AssertionFailedError e = Assertions.assertThrows(AssertionFailedError.class, () ->
+                Assertions.assertEquals(result.games().getFirst().gameID(), 2, "Result did not give the same ID as expected"));
+
+        AssertionFailedError f = Assertions.assertThrows(AssertionFailedError.class, () ->
+                Assertions.assertEquals(result.games().get(1).gameID(), 1, "Result did not give the same ID as expected"));
+    }
+
+    @Test
     public void clearGameSuccess() throws SQLException, DataAccessException {
         sqlGameDataAccess.clearGameDAO();
     }
+
 }
