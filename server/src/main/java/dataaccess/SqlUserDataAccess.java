@@ -13,11 +13,9 @@ public class SqlUserDataAccess implements UserDAO{
         try (var conn = DatabaseManager.getConnection()) {
             try (var preparedStatement = conn.prepareStatement(query)) {
                 preparedStatement.setString(1, username);
-                var rs = preparedStatement.executeQuery();  // Executes the query
+                var rs = preparedStatement.executeQuery();
                 if (rs.next()) {
-                    //System.out.println("Username: " + rs.getString("username"));
-                    //System.out.println("Email: " + rs.getString("email"));
-                    myUser = new UserData(rs.getString("username"), null, rs.getString("email"));
+                    myUser = new UserData(rs.getString("username"), rs.getString("password"), rs.getString("email"));
                     return myUser;
                 }
             }

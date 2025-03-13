@@ -48,30 +48,34 @@ public class UserService {
     }
 
     public LoginResult login(LoginRequest loginRequest) throws DataAccessException, SQLException {
-
         UserData currUser = userDataAccess.getUser(loginRequest.username());
-        if(currUser != null){
+
+        if (currUser != null) {
             String expectedHashedPassword = currUser.password();
+            System.out.println(expectedHashedPassword);
+
+            if (expectedHashedPassword == null || expectedHashedPassword.isEmpty()) {
+                throw new DataAccessException(500, "Error: No password stored for user.");
+            }
+
             boolean foundHashedPassword = BCrypt.checkpw(loginRequest.password(), expectedHashedPassword);
 
             if (foundHashedPassword) {
                 String authToken = AuthService.generateToken();
                 LoginResult result = new LoginResult(loginRequest.username(), authToken);
 
-                //need to make an AuthData object and call createAuth() ??
                 AuthData myAuth = new AuthData(authToken, loginRequest.username());
                 AuthData auth = authDataAccess.createAuth(myAuth);
 
                 return result;
+            } else {
+                throw new DataAccessException(401, "Error: Unauthorized - incorrect password");
             }
-            else{
-                throw new DataAccessException(401, "Error: unauthorized");
-            }
-        }
-        else{
-            throw new DataAccessException(401, "Error: unauthorized");
+        } else {
+            throw new DataAccessException(401, "Error: Unauthorized - user does not exist");
         }
     }
+
 
     public void logout(String authToken) throws DataAccessException {
         if(authToken != null){

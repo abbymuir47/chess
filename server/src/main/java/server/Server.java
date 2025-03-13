@@ -22,9 +22,9 @@ public class Server {
     private final GameDAO gameDataAccess;
 
     public Server(){
-        this.userDataAccess = new MemoryUserDataAccess();
-        this.authDataAccess = new MemoryAuthDataAccess();
-        this.gameDataAccess = new MemoryGameDataAccess();
+        this.userDataAccess = new SqlUserDataAccess();
+        this.authDataAccess = new SqlAuthDataAccess();
+        this.gameDataAccess = new SqlGameDataAccess();
         this.userService = new UserService(userDataAccess,authDataAccess);
         this.authService = new AuthService(userDataAccess,authDataAccess);
         this.gameService = new GameService(userDataAccess,authDataAccess,gameDataAccess);

@@ -12,20 +12,19 @@ public class DatabaseManager {
     private final String[] createTables = {
     """
     CREATE TABLE IF NOT EXISTS user (
-      `id` int NOT NULL AUTO_INCREMENT,
       `username` varchar(256) NOT NULL,
       `password` varchar(256) NOT NULL,
       `email` varchar(256) NOT NULL,
-      PRIMARY KEY (`id`),
+      PRIMARY KEY (`username`),
       INDEX (`username`)
     ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci
     """,
     """
     CREATE TABLE IF NOT EXISTS game (
-      `gameID` int NOT NULL,
-      `whiteUsername` varchar(256) NOT NULL,
-      `blackUsername` varchar(256) NOT NULL,
-      `game_name` varchar(256) NOT NULL,
+      `gameID` int AUTO_INCREMENT,
+      `whiteUsername` varchar(256),
+      `blackUsername` varchar(256),
+      `game_name` varchar(256),
       `game_data` TEXT,
       PRIMARY KEY (`gameID`)
     ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci

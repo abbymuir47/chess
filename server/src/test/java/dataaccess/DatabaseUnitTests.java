@@ -1,5 +1,6 @@
 package dataaccess;
 
+import chess.ChessGame;
 import handlermodel.*;
 import model.*;
 import org.junit.jupiter.api.*;
@@ -26,15 +27,16 @@ public class DatabaseUnitTests {
     public void createUserSuccess() throws SQLException {
         UserData newUser = new UserData("user1", "password1", "email1");
 
-        UserData isCreated = sqlUserDataAccess.createUser(newUser);
-        System.out.println("User created: " + isCreated);
+        UserData createdUser = sqlUserDataAccess.createUser(newUser);
+        System.out.println("User created: " + createdUser);
 
         UserData retrievedUser = sqlUserDataAccess.getUser("user1");
         System.out.println("Retrieved user: " + retrievedUser);
 
-        Assertions.assertNotNull("User should be created", String.valueOf(isCreated)); // Checks if the user was created
-        Assertions.assertNotNull("User should be retrieved", String.valueOf(retrievedUser)); // Checks if user was found
-        Assertions.assertEquals("user1", "user1", retrievedUser.username()); // Ensures the username matches
+        Assertions.assertNotNull("User should be created", String.valueOf(createdUser));
+        Assertions.assertNotNull("User should be retrieved", String.valueOf(retrievedUser));
+        Assertions.assertEquals(retrievedUser.username(), "user1",
+                "Response did not give the same gameID as expected");
     }
 
     @Test
@@ -46,18 +48,16 @@ public class DatabaseUnitTests {
     public void createAuthSuccess() throws DataAccessException, SQLException {
         AuthData newAuth = new AuthData("authToken123", "user1");
 
-        // Creating the AuthData entry
         AuthData createdAuth = sqlAuthDataAccess.createAuth(newAuth);
         System.out.println("Auth created: " + createdAuth);
 
-        // Retrieving the created AuthData to ensure it's stored
         AuthData retrievedAuth = sqlAuthDataAccess.getAuth("authToken123");
         System.out.println("Retrieved auth: " + retrievedAuth);
 
-        // Assertions
-        Assertions.assertNotNull("Auth should be created", String.valueOf(createdAuth)); // Check if creation was successful
-        Assertions.assertNotNull("Auth should be retrieved", String.valueOf(retrievedAuth)); // Check if the AuthData is retrieved
-        Assertions.assertEquals("authToken123", retrievedAuth.authToken()); // Ensure the authToken matches
+        Assertions.assertNotNull("Auth should be created", String.valueOf(createdAuth));
+        Assertions.assertNotNull("Auth should be retrieved", String.valueOf(retrievedAuth));
+        Assertions.assertEquals(retrievedAuth.authToken(),"authToken123",
+                "Response did not give the same auth as expected");
     }
 
     @Test
@@ -88,6 +88,22 @@ public class DatabaseUnitTests {
     @Test
     public void clearAuthSuccess() throws SQLException, DataAccessException {
         sqlAuthDataAccess.clearAuthDAO();
+    }
+
+    @Test
+    public void createGameSuccess() throws SQLException, DataAccessException {
+        ChessGame chessGame = new ChessGame();
+
+        GameData game = new GameData(1, null, null, "game1name", chessGame);
+        GameData newGame = sqlGameDataAccess.createGame(game);
+        System.out.println("Game created: " + newGame);
+
+        GameData retrievedGame = sqlGameDataAccess.getGame(1);
+        System.out.println("Retrieved user: " + retrievedGame);
+
+        Assertions.assertNotNull("Game should be created", String.valueOf(newGame)); // Checks if the user was created
+        Assertions.assertNotNull("User should be retrieved", String.valueOf(retrievedGame)); // Checks if user was found
+        //Assertions.assertEquals("user1", "user1", retrievedGame.username()); // Ensures the username matches
     }
 
 }
