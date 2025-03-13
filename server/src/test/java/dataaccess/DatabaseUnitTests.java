@@ -209,7 +209,7 @@ public class DatabaseUnitTests {
         GameData newGame2 = sqlGameDataAccess.createGame(game2);
 
         ArrayList<GameData> games = sqlGameDataAccess.listGames();
-        System.out.println(games);
+
         Assertions.assertTrue(games.size() > 1, "Not enough games in the list");
 
         Assertions.assertEquals(games.get(0).gameID(), 2001,
@@ -221,7 +221,15 @@ public class DatabaseUnitTests {
 
     @Test
     public void listGamesFail() throws DataAccessException, SQLException {
+        ChessGame chessGame = new ChessGame();
+
+        GameData game1 = new GameData(3001, "white1", "black1", "game1name", chessGame);
+        GameData newGame1 = sqlGameDataAccess.createGame(game1);
+        GameData game2 = new GameData(3002, "white2", "black2", "game2name", chessGame);
+        GameData newGame2 = sqlGameDataAccess.createGame(game2);
+
         ArrayList<GameData> games = sqlGameDataAccess.listGames();
+
 
         AssertionFailedError e = Assertions.assertThrows(AssertionFailedError.class, () ->
                 Assertions.assertEquals(games.get(0).gameID(), 9999, "Response did not give the expected gameID at index 0"));
