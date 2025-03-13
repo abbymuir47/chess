@@ -101,9 +101,12 @@ public class DatabaseUnitTests {
         GameData retrievedGame = sqlGameDataAccess.getGame(1);
         System.out.println("Retrieved user: " + retrievedGame);
 
-        Assertions.assertNotNull("Game should be created", String.valueOf(newGame)); // Checks if the user was created
-        Assertions.assertNotNull("User should be retrieved", String.valueOf(retrievedGame)); // Checks if user was found
-        //Assertions.assertEquals("user1", "user1", retrievedGame.username()); // Ensures the username matches
+        Assertions.assertNotNull("Game should be created", String.valueOf(newGame));
+        Assertions.assertNotNull("User should be retrieved", String.valueOf(retrievedGame));
     }
 
+    @Test
+    public void clearGameSuccess() throws SQLException, DataAccessException {
+        sqlGameDataAccess.clearGameDAO();
+    }
 }

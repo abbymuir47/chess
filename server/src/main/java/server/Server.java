@@ -20,6 +20,7 @@ public class Server {
     private final UserDAO userDataAccess;
     private final AuthDAO authDataAccess;
     private final GameDAO gameDataAccess;
+    DatabaseManager manager = new DatabaseManager();
 
     public Server(){
         this.userDataAccess = new SqlUserDataAccess();
@@ -28,6 +29,11 @@ public class Server {
         this.userService = new UserService(userDataAccess,authDataAccess);
         this.authService = new AuthService(userDataAccess,authDataAccess);
         this.gameService = new GameService(userDataAccess,authDataAccess,gameDataAccess);
+        try {
+            manager.configureDatabase();
+        } catch (DataAccessException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     public int run(int desiredPort) {
