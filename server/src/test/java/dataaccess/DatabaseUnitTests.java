@@ -8,6 +8,7 @@ import org.opentest4j.AssertionFailedError;
 import service.*;
 
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.NoSuchElementException;
 
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
@@ -200,36 +201,36 @@ public class DatabaseUnitTests {
 
     @Test
     public void listGamesSuccess() throws DataAccessException, SQLException {
-        RegisterRequest newUser = new RegisterRequest("whiteUser", "myPassword", "myEmail");
-        RegisterResult user = userService.register(newUser);
+        ChessGame chessGame = new ChessGame();
 
-        CreateResult game1 = gameService.creategame(new CreateRequest("game1"));
-        CreateResult game2 = gameService.creategame(new CreateRequest("game2"));
+        GameData game1 = new GameData(2001, "white1", "black1", "game1name", chessGame);
+        //GameData newGame1 = sqlGameDataAccess.createGame(game1);
+        GameData game2 = new GameData(2002, "white2", "black2", "game2name", chessGame);
+        //GameData newGame2 = sqlGameDataAccess.createGame(game2);
 
-        ListResult result = gameService.listgames(user.authToken());
+        ArrayList<GameData> games = sqlGameDataAccess.listGames();
+        System.out.println(games);
+        // Ensure the list contains at least two games
+        Assertions.assertTrue(games.size() > 1, "Not enough games in the list");
 
-        Assertions.assertEquals(result.games().getFirst().gameID(), 1,
+        Assertions.assertEquals(games.get(0).gameID(), 2001,
                 "Response did not give the same gameID as expected");
-        Assertions.assertEquals(result.games().get(1).gameID(), 2,
+        Assertions.assertEquals(games.get(1).gameID(), 2002,
                 "Response did not give the same gameID as expected");
     }
+
 
     @Test
     public void listGamesFail() throws DataAccessException, SQLException {
-        RegisterRequest newUser = new RegisterRequest("whiteUser", "myPassword", "myEmail");
-        RegisterResult user = userService.register(newUser);
-
-        CreateResult game1 = gameService.creategame(new CreateRequest("game1"));
-        CreateResult game2 = gameService.creategame(new CreateRequest("game2"));
-
-        ListResult result = gameService.listgames(user.authToken());
+        ArrayList<GameData> games = sqlGameDataAccess.listGames();
 
         AssertionFailedError e = Assertions.assertThrows(AssertionFailedError.class, () ->
-                Assertions.assertEquals(result.games().getFirst().gameID(), 2, "Result did not give the same ID as expected"));
+                Assertions.assertEquals(games.get(0).gameID(), 9999, "Response did not give the expected gameID at index 0"));
+        e = Assertions.assertThrows(AssertionFailedError.class, () ->
+                Assertions.assertEquals(games.get(1).gameID(), 8888, "Response did not give the expected gameID at index 1"));
 
-        AssertionFailedError f = Assertions.assertThrows(AssertionFailedError.class, () ->
-                Assertions.assertEquals(result.games().get(1).gameID(), 1, "Result did not give the same ID as expected"));
     }
+
 
     @Test
     public void clearGameSuccess() throws SQLException, DataAccessException {
