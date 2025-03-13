@@ -204,13 +204,12 @@ public class DatabaseUnitTests {
         ChessGame chessGame = new ChessGame();
 
         GameData game1 = new GameData(2001, "white1", "black1", "game1name", chessGame);
-        //GameData newGame1 = sqlGameDataAccess.createGame(game1);
+        GameData newGame1 = sqlGameDataAccess.createGame(game1);
         GameData game2 = new GameData(2002, "white2", "black2", "game2name", chessGame);
-        //GameData newGame2 = sqlGameDataAccess.createGame(game2);
+        GameData newGame2 = sqlGameDataAccess.createGame(game2);
 
         ArrayList<GameData> games = sqlGameDataAccess.listGames();
         System.out.println(games);
-        // Ensure the list contains at least two games
         Assertions.assertTrue(games.size() > 1, "Not enough games in the list");
 
         Assertions.assertEquals(games.get(0).gameID(), 2001,
