@@ -26,32 +26,26 @@ public class ChessBoard {
 
         drawHeaders(out);
         drawChessBoard(out);
+        drawHeaders(out);
     }
 
     private static void drawHeaders(PrintStream out) {
-        out.print("   ");
         out.print(SET_BG_COLOR_LIGHT_GREY);
+        out.print("   ");
         String[] headers = { "a","b","c","d","e","f","g","h" };
         for (int boardCol = 0; boardCol < BOARD_SIZE_IN_SQUARES; ++boardCol) {
             drawHeader(out, headers[boardCol]);
         }
+        out.print("   ");
         setBlack(out);
         out.println();
     }
 
     private static void drawHeader(PrintStream out, String headerText) {
-        int prefixLength = 1;
-        int suffixLength = 1;
-
-        out.print(" ");
-        printHeaderText(out, headerText);
-        out.print(" ");
-    }
-
-    private static void printHeaderText(PrintStream out, String letter) {
-        out.print(SET_BG_COLOR_LIGHT_GREY);;
         out.print(SET_TEXT_COLOR_GREEN);
-        out.print(letter);
+        out.print(" ");
+        out.print(headerText);
+        out.print(" ");
     }
 
     private static void drawChessBoard(PrintStream out) {
