@@ -10,11 +10,9 @@ public class ChessBoard {
 
     // Board dimensions.
     private static final int BOARD_SIZE_IN_SQUARES = 8;
-    private static final int SQUARE_SIZE_IN_PADDED_CHARS = 1;
-    private static final int LINE_WIDTH_IN_PADDED_CHARS = 1;
 
     // Padded characters.
-    private static final String EMPTY = "  ";
+    private static final String EMPTY = " ";
     private static final String X = " X ";
     private static final String O = " O ";
 
@@ -31,50 +29,50 @@ public class ChessBoard {
     }
 
     private static void drawHeaders(PrintStream out) {
+        out.print("   ");
         out.print(SET_BG_COLOR_LIGHT_GREY);
         String[] headers = { "a","b","c","d","e","f","g","h" };
-        out.print(" ");
         for (int boardCol = 0; boardCol < BOARD_SIZE_IN_SQUARES; ++boardCol) {
             drawHeader(out, headers[boardCol]);
-
-            if (boardCol < BOARD_SIZE_IN_SQUARES - 1) {
-                out.print(EMPTY.repeat(LINE_WIDTH_IN_PADDED_CHARS));
-            }
         }
+        setBlack(out);
         out.println();
     }
 
     private static void drawHeader(PrintStream out, String headerText) {
-        int prefixLength = SQUARE_SIZE_IN_PADDED_CHARS / 2;
-        int suffixLength = SQUARE_SIZE_IN_PADDED_CHARS - prefixLength - 1;
+        int prefixLength = 1;
+        int suffixLength = 1;
 
-        out.print(EMPTY.repeat(prefixLength));
+        out.print(" ");
         printHeaderText(out, headerText);
-        out.print(EMPTY.repeat(suffixLength));
+        out.print(" ");
     }
 
     private static void printHeaderText(PrintStream out, String letter) {
         out.print(SET_BG_COLOR_LIGHT_GREY);;
         out.print(SET_TEXT_COLOR_GREEN);
-
         out.print(letter);
-
-        setBlack(out);
     }
 
     private static void drawChessBoard(PrintStream out) {
-
         for (int boardRow = 0; boardRow < BOARD_SIZE_IN_SQUARES; ++boardRow) {
-                if (boardRow % 2 == 0) {
-                    drawWhiteRowOfSquares(out);
-                }
-                else {
-                    drawBlackRowOfSquares(out);
-                }
+            if (boardRow % 2 == 0) {
+                drawWhiteRowOfSquares(out, boardRow);
+            }
+            else {
+                drawBlackRowOfSquares(out, boardRow);
+            }
         }
     }
 
-    private static void drawWhiteRowOfSquares(PrintStream out) {
+    private static void drawRowNumberSquare(PrintStream out, int boardRow) {
+        out.print(SET_BG_COLOR_LIGHT_GREY);
+        out.print(SET_TEXT_COLOR_GREEN);
+        out.print(" " + boardRow + " ");
+    }
+
+    private static void drawWhiteRowOfSquares(PrintStream out, int boardRow) {
+        drawRowNumberSquare(out, boardRow);
         for (int boardCol = 0; boardCol < BOARD_SIZE_IN_SQUARES; ++boardCol) {
             if (boardCol % 2 == 0){
                 drawWhiteSquare(out, rand.nextBoolean() ? X : O);
@@ -82,11 +80,13 @@ public class ChessBoard {
                 drawBlackSquare(out, rand.nextBoolean() ? X : O);
             }
         }
-        out.print(SET_BG_COLOR_LIGHT_GREY);
+        drawRowNumberSquare(out, boardRow);
+        setBlack(out);
         out.println();
     }
 
-    private static void drawBlackRowOfSquares(PrintStream out) {
+    private static void drawBlackRowOfSquares(PrintStream out, int boardRow) {
+        drawRowNumberSquare(out, boardRow);
         for (int boardCol = 0; boardCol < BOARD_SIZE_IN_SQUARES; ++boardCol) {
             if (boardCol % 2 == 0){
                 drawBlackSquare(out, rand.nextBoolean() ? X : O);
@@ -94,7 +94,8 @@ public class ChessBoard {
                 drawWhiteSquare(out, rand.nextBoolean() ? X : O);
             }
         }
-        out.print(SET_BG_COLOR_LIGHT_GREY);
+        drawRowNumberSquare(out, boardRow);
+        setBlack(out);
         out.println();
     }
 
