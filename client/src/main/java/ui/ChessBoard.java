@@ -17,13 +17,13 @@ public class ChessBoard {
     // Board dimensions.
     private static final int BOARD_SIZE_IN_SQUARES = 8;
 
-    // Padded characters.
-    private static final String EMPTY = " ";
-    private static final String X = " X ";
-    private static final String O = " O ";
-
     private static Random rand = new Random();
     private static chess.ChessBoard exampleBoard = new chess.ChessBoard();
+
+    enum ColorPerspective{
+        WHITE_PLAYER,
+        BLACK_PLAYER
+    }
 
     public static void main(String[] args) {
         exampleBoard.resetBoard();
@@ -32,15 +32,16 @@ public class ChessBoard {
 
         out.print(ERASE_SCREEN);
 
-        drawHeaders(out);
-        drawChessBoard(out);
-        drawHeaders(out);
+        drawHeaders(out, ColorPerspective.BLACK_PLAYER);
+        drawChessBoard(out, ColorPerspective.BLACK_PLAYER);
+        drawHeaders(out, ColorPerspective.BLACK_PLAYER);
     }
 
-    private static void drawHeaders(PrintStream out) {
+    private static void drawHeaders(PrintStream out, ColorPerspective perspective) {
         out.print(SET_BG_COLOR_DARK_GREEN);
         out.print("   ");
-        String[] headers = { "a","b","c","d","e","f","g","h" };
+        String[] headers = perspective == ColorPerspective.WHITE_PLAYER ?
+                new String[]{"a", "b", "c", "d", "e", "f", "g", "h"} : new String[]{ "h","g","f","e","d","c","b","a" };
         for (int boardCol = 0; boardCol < BOARD_SIZE_IN_SQUARES; ++boardCol) {
             drawLetter(out, headers[boardCol]);
         }
@@ -56,8 +57,12 @@ public class ChessBoard {
         out.print(" ");
     }
 
-    private static void drawChessBoard(PrintStream out) {
-        for (int boardRow = 8; boardRow > 0; --boardRow) {
+    private static void drawChessBoard(PrintStream out, ColorPerspective perspective) {
+        int startRow = perspective == ColorPerspective.WHITE_PLAYER ? 8 : 1;
+        int endRow = perspective == ColorPerspective.WHITE_PLAYER ? 1 : 8;
+        int step = perspective == ColorPerspective.WHITE_PLAYER ? -1 : 1;
+
+        for (int boardRow = startRow; (perspective == ColorPerspective.WHITE_PLAYER ? boardRow >= endRow : boardRow <= endRow); boardRow += step) {
             if (boardRow % 2 == 0) {
                 drawWhiteRowOfSquares(out, boardRow);
             }
@@ -99,11 +104,6 @@ public class ChessBoard {
         drawRowNumberSquare(out, boardRow);
         setBlack(out);
         out.println();
-    }
-
-    private static void setWhite(PrintStream out) {
-        out.print(SET_BG_COLOR_WHITE);
-        out.print(SET_TEXT_COLOR_WHITE);
     }
 
     private static void setBlack(PrintStream out) {
