@@ -26,15 +26,15 @@ public class ChessBoard {
     }
 
     public static void main(String[] args) {
-        exampleBoard.resetBoard();
-
         var out = new PrintStream(System.out, true, StandardCharsets.UTF_8);
-
         out.print(ERASE_SCREEN);
 
-        drawHeaders(out, ColorPerspective.BLACK_PLAYER);
-        drawChessBoard(out, ColorPerspective.BLACK_PLAYER);
-        drawHeaders(out, ColorPerspective.BLACK_PLAYER);
+        exampleBoard.resetBoard();
+        ColorPerspective currPerspective = ColorPerspective.BLACK_PLAYER;
+
+        drawHeaders(out, currPerspective);
+        drawChessBoard(out, currPerspective);
+        drawHeaders(out, currPerspective);
     }
 
     private static void drawHeaders(PrintStream out, ColorPerspective perspective) {
