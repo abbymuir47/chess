@@ -11,7 +11,7 @@ public class Client {
     private String visitorName = null;
     //private final ServerFacade server;
     private final String serverUrl;
-    private State state = State.LOGGEDOUT;
+    private State state = State.LOGGEDIN;
 
     public Client(String serverUrl) {
         //server = new ServerFacade(serverUrl);
@@ -48,55 +48,54 @@ public class Client {
         var cmd = (tokens.length > 0) ? tokens[0] : "help";
         var params = Arrays.copyOfRange(tokens, 1, tokens.length);
         return switch (cmd) {
-            case "register" -> register(params);
-            case "login" -> login(params);
-            case "list" -> listGames(params);
-            case "observe" -> observeGame(params);
-            case "join" -> joinGame(params);
-            case "logout" -> logOut(params);
+            case "1" -> register(params);
+            case "2" -> login(params);
+            case "3" -> listGames(params);
+            case "4" -> observeGame(params);
+            case "5" -> joinGame(params);
+            case "6" -> logOut(params);
             case "quit" -> "quit";
             default -> help();
         };
     }
 
     private String register(String[] params) {
-        return "";
+        return "register request";
     }
 
     private String login(String[] params) {
-        return "";
+        return "login request";
     }
 
     private String listGames(String[] params) {
-        return "";
+        return "list game request";
     }
 
     private String observeGame(String[] params) {
-        return "";
+        return "observe game request";
     }
 
     private String joinGame(String[] params) {
-        return "";
+        return "join game request";
     }
 
     private String logOut(String[] params) {
-        return "";
+        return "logout request";
     }
 
     public String help() {
         if (state == State.LOGGEDOUT) {
             return """
-                    - login <yourname>
-                    - quit
+                    Please select an option:
+                    1. Register user
+                    2. Login
                     """;
         }
         return """
                 Please select an option:
-                1. Register user
-                2. Login
-                3. Join game
+                3. List games
                 4. Observe game
-                5. List games
+                5. Join game
                 6. Logout
                 """;
     }
