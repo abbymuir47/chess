@@ -1,6 +1,7 @@
 package ui;
 
-import exception.DataAccessException;
+import exception.ResponseException;
+import server.ServerFacade;
 
 import java.util.Arrays;
 import java.util.Scanner;
@@ -9,12 +10,12 @@ import static ui.EscapeSequences.*;
 public class Client {
 
     private String visitorName = null;
-    //private final ServerFacade server;
+    private final ServerFacade server;
     private final String serverUrl;
     private State state = State.LOGGEDIN;
 
     public Client(String serverUrl) {
-        //server = new ServerFacade(serverUrl);
+        server = new ServerFacade(serverUrl);
         this.serverUrl = serverUrl;
     }
 
@@ -43,7 +44,7 @@ public class Client {
         System.out.print("\n" + RESET + ">>> " + SET_TEXT_COLOR_GREEN);
     }
 
-    public String eval(String input) throws DataAccessException {
+    public String eval(String input) throws ResponseException {
         var tokens = input.toLowerCase().split(" ");
         var cmd = (tokens.length > 0) ? tokens[0] : "help";
         var params = Arrays.copyOfRange(tokens, 1, tokens.length);
@@ -59,27 +60,33 @@ public class Client {
         };
     }
 
-    private String register(String[] params) {
+    private String register(String[] params) throws ResponseException {
+        assertSignedIn();
         return "register request";
     }
 
-    private String login(String[] params) {
+    private String login(String[] params) throws ResponseException {
+        assertSignedIn();
         return "login request";
     }
 
-    private String listGames(String[] params) {
+    private String listGames(String[] params) throws ResponseException {
+        assertSignedIn();
         return "list game request";
     }
 
-    private String observeGame(String[] params) {
+    private String observeGame(String[] params) throws ResponseException {
+        assertSignedIn();
         return "observe game request";
     }
 
-    private String joinGame(String[] params) {
+    private String joinGame(String[] params) throws ResponseException {
+        assertSignedIn();
         return "join game request";
     }
 
-    private String logOut(String[] params) {
+    private String logOut(String[] params) throws ResponseException {
+        assertSignedIn();
         return "logout request";
     }
 
@@ -100,9 +107,9 @@ public class Client {
                 """;
     }
 
-    private void assertSignedIn() throws DataAccessException {
+    private void assertSignedIn() throws ResponseException {
         if (state == State.LOGGEDOUT) {
-            throw new DataAccessException(400, "You must sign in");
+            throw new ResponseException(400, "You must sign in");
         }
     }
 }
