@@ -1,6 +1,7 @@
 package ui;
 
 import exception.ResponseException;
+import handlermodel.*;
 import server.ServerFacade;
 
 import java.util.Arrays;
@@ -12,7 +13,7 @@ public class Client {
     private String visitorName = null;
     private final ServerFacade server;
     private final String serverUrl;
-    private State state = State.LOGGEDIN;
+    private State state = State.LOGGEDOUT;
 
     public Client(String serverUrl) {
         server = new ServerFacade(serverUrl);
@@ -45,12 +46,12 @@ public class Client {
     }
 
     public String eval(String input) throws ResponseException {
-        var tokens = input.toLowerCase().split(" ");
+        var tokens = input.split(" ");
         var cmd = (tokens.length > 0) ? tokens[0] : "help";
         var params = Arrays.copyOfRange(tokens, 1, tokens.length);
         return switch (cmd) {
-            case "1" -> register(params);
-            case "2" -> login(params);
+            case "register" -> register(params);
+            case "login" -> login(params);
             case "3" -> listGames(params);
             case "4" -> observeGame(params);
             case "5" -> joinGame(params);
@@ -61,13 +62,25 @@ public class Client {
     }
 
     private String register(String[] params) throws ResponseException {
-        assertSignedIn();
-        return "register request";
+        if(params.length == 3) {
+            RegisterRequest req = new RegisterRequest(params[0], params[1], params[2]);
+            //System.out.println("in client, about to make request: " + req);
+            RegisterResult res = server.register(req);
+            //System.out.println(res);
+            return ("You registered as " + res.username());
+        }
+        throw new ResponseException(400, "Expected: <username> <password> <email>");
     }
 
     private String login(String[] params) throws ResponseException {
-        assertSignedIn();
-        return "login request";
+        if(params.length == 2) {
+            LoginRequest req = new LoginRequest(params[0], params[1]);
+            LoginResult res = server.login(req);
+            System.out.println("authToken: " + res.authToken());
+            state = State.LOGGEDIN;
+            return ("You logged in as " + res.username());
+        }
+        throw new ResponseException(400, "Expected: <username> <password>");
     }
 
     private String listGames(String[] params) throws ResponseException {
@@ -94,8 +107,8 @@ public class Client {
         if (state == State.LOGGEDOUT) {
             return """
                     Please select an option:
-                    1. Register user
-                    2. Login
+                    Register user: enter "register <username> <password> <email>"
+                    Login: enter "login <username> <password>
                     """;
         }
         return """

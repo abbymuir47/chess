@@ -1,7 +1,6 @@
 package dataaccess;
 
 import chess.ChessGame;
-import handlermodel.*;
 import model.*;
 import org.junit.jupiter.api.*;
 import org.opentest4j.AssertionFailedError;
@@ -9,7 +8,6 @@ import service.*;
 
 import java.sql.SQLException;
 import java.util.ArrayList;
-import java.util.NoSuchElementException;
 
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 public class DatabaseUnitTests {

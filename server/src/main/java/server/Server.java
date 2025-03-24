@@ -3,8 +3,8 @@ package server;
 import com.google.gson.Gson;
 //import exception.ResponseException;
 import dataaccess.*;
-import handlermodel.*;
 
+import handlermodel.*;
 import model.AuthData;
 import service.*;
 import spark.*;

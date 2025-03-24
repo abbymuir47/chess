@@ -1,7 +1,6 @@
 package service;
 
 import dataaccess.*;
-import handlermodel.*;
 import org.junit.jupiter.api.*;
 import org.opentest4j.AssertionFailedError;
 
