@@ -25,8 +25,12 @@ public class ServerFacade {
 
     public LoginResult login(LoginRequest req) throws ResponseException {
         var path = "/session";
-        //System.out.println("about to make register request from serverfacade, req:" + req);
         return this.makeRequest("POST", path, req, LoginResult.class);
+    }
+
+    public ListResult listGames() throws ResponseException {
+        var path = "/game";
+        return this.makeRequest("GET", path, null, ListResult.class);
     }
 
     private <T> T makeRequest(String method, String path, Object request, Class<T> responseClass) throws ResponseException {

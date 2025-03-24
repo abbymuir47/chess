@@ -21,8 +21,7 @@ public class Client {
     }
 
     public void run() {
-        System.out.println("Welcome to chess. Sign in to start.");
-        System.out.print(this.help());
+        System.out.println("Welcome to chess. Type help to get started.");
 
         Scanner scanner = new Scanner(System.in);
         var result = "";
@@ -42,7 +41,7 @@ public class Client {
     }
 
     private void printPrompt() {
-        System.out.print("\n" + RESET + ">>> " + SET_TEXT_COLOR_GREEN);
+        System.out.print("\n" + state + " >>> " + SET_TEXT_COLOR_GREEN);
     }
 
     public String eval(String input) throws ResponseException {
@@ -52,10 +51,11 @@ public class Client {
         return switch (cmd) {
             case "register" -> register(params);
             case "login" -> login(params);
-            case "3" -> listGames(params);
-            case "4" -> observeGame(params);
-            case "5" -> joinGame(params);
-            case "6" -> logOut(params);
+            case "create" -> createGame(params);
+            case "list" -> listGames(params);
+            case "observe" -> observeGame(params);
+            case "join" -> joinGame(params);
+            case "logout" -> logOut(params);
             case "quit" -> "quit";
             default -> help();
         };
@@ -78,14 +78,24 @@ public class Client {
             LoginResult res = server.login(req);
             System.out.println("authToken: " + res.authToken());
             state = State.LOGGEDIN;
-            return ("You logged in as " + res.username());
+            return ("You logged in as " + res.username() + ". Type help to see more actions.\n");
         }
         throw new ResponseException(400, "Expected: <username> <password>");
     }
 
+    private String createGame(String[] params) throws ResponseException {
+        assertSignedIn();
+        return "create game request";
+    }
+
     private String listGames(String[] params) throws ResponseException {
         assertSignedIn();
-        return "list game request";
+        if(params.length == 0) {
+            //ListResult(ArrayList<GameData> games)
+            ListResult res = server.listGames();
+            return ("You listed all the games: " + res);
+        }
+        throw new ResponseException(400, "Expected: list");
     }
 
     private String observeGame(String[] params) throws ResponseException {
@@ -109,14 +119,19 @@ public class Client {
                     Please select an option:
                     Register user: enter "register <username> <password> <email>"
                     Login: enter "login <username> <password>
+                    Quit: "quit"
+                    Help menu: "help"
                     """;
         }
         return """
                 Please select an option:
-                3. List games
-                4. Observe game
-                5. Join game
-                6. Logout
+                Create a game: enter "create <game name>"
+                List games: enter "list"
+                Observe game: enter "observe <game ID>"
+                Join game: enter "join <game ID> <WHITE/BLACK>"
+                Logout: "logout"
+                Quit: "quit"
+                Help menu: "help"
                 """;
     }
 
