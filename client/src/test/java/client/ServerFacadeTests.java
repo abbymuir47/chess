@@ -18,12 +18,13 @@ public class ServerFacadeTests {
     private static ServerFacade facade;
 
     @BeforeAll
-    public static void init() {
+    public static void init() throws ResponseException {
         server = new Server();
         var port = server.run(0);
         String url = ("http://localhost:" + port + "/");
         System.out.println("Started test HTTP server on " + port);
         facade = new ServerFacade(url);
+        facade.clear();
     }
 
     @AfterAll
@@ -114,7 +115,8 @@ public class ServerFacadeTests {
         facade.login(req);
 
         JoinRequest joinRequest = new JoinRequest("BLACK", 1);
-        assertNotNull(facade.joinGame(joinRequest));
+        assertTrue(facade.joinGame(joinRequest) != null);
+        //assertNotNull(facade.joinGame(joinRequest));
     }
 
     @Test
@@ -126,6 +128,23 @@ public class ServerFacadeTests {
 
         JoinRequest joinRequest = new JoinRequest("GREEN", 1);
         assertThrows(ResponseException.class, ()-> facade.joinGame(joinRequest));
+    }
+
+    @Test
+    public void logoutSuccess() throws ResponseException {
+        RegisterRequest req10 = new RegisterRequest("player10", "password", "p10@email.com");
+        LoginRequest req = new LoginRequest("player10", "password");
+        LoginResult res = facade.login(req);
+
+        assertTrue(res.authToken().length() > 10);
+    }
+
+    @Test
+    public void logoutFail() throws ResponseException{
+        RegisterRequest req4 = new RegisterRequest("player4", "password", "p3@email.com");
+        facade.register(req4);
+        LoginRequest req = new LoginRequest("player4", "wrongPassword");
+        assertThrows(ResponseException.class, ()-> facade.login(req));
     }
 
 }

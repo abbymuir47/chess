@@ -48,6 +48,16 @@ public class ServerFacade {
         return this.makeRequest("PUT", path, req, Object.class);
     }
 
+    public void logout() throws ResponseException{
+        var path = "/session";
+        this.makeRequest("DELETE", path, null, Object.class);
+    }
+
+    public void clear() throws ResponseException{
+        var path = "/db";
+        this.makeRequest("DELETE", path, null, Object.class);
+    }
+
     private <T> T makeRequest(String method, String path, Object request, Class<T> responseClass) throws ResponseException {
         try {
             URL url = (new URI(serverUrl + path)).toURL();

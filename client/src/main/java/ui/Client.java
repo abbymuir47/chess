@@ -66,7 +66,7 @@ public class Client {
             case "list" -> listGames(params);
             case "observe" -> observeGame(params);
             case "join" -> joinGame(params);
-            case "logout" -> logOut(params);
+            case "logout" -> logout(params);
             case "quit" -> "quit";
             default -> help();
         };
@@ -166,10 +166,13 @@ public class Client {
         throw new ResponseException("Expected: <game ID> <WHITE/BLACK>");
     }
 
-    private String logOut(String[] params) throws ResponseException {
-        assertSignedIn();
-        state = State.LOGGEDOUT;
-        return "Logged out successfully";
+    private String logout(String[] params) throws ResponseException {
+        if(params.length == 0){
+            assertSignedIn();
+            server.logout();
+            return "Logged out successfully";
+        }
+        throw new ResponseException("Expected: logout");
     }
 
     public String help() {
