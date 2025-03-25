@@ -6,10 +6,12 @@ import handlermodel.*;
 import model.GameData;
 import server.ServerFacade;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Scanner;
+import java.awt.*;
+import java.io.PrintStream;
+import java.nio.charset.StandardCharsets;
+import java.util.*;
 
+import static chess.ChessGame.TeamColor.WHITE;
 import static ui.ChessBoard.ColorPerspective.*;
 import static ui.EscapeSequences.*;
 
@@ -18,10 +20,15 @@ public class Client {
     private final ServerFacade server;
     private final String serverUrl;
     private State state = State.LOGGEDOUT;
+    private Map<Integer, GameData> gameMap = new HashMap<>();
+    private static PrintStream out;
+    private ChessBoard.ColorPerspective defaultPerspective = WHITE_PLAYER;
+    private ChessBoard.ColorPerspective currPerspective;
 
     public Client(String serverUrl) {
         server = new ServerFacade(serverUrl);
         this.serverUrl = serverUrl;
+        this.out = new PrintStream(System.out, true, StandardCharsets.UTF_8);
     }
 
     public void run() {
@@ -58,7 +65,7 @@ public class Client {
             case "create" -> createGame(params);
             case "list" -> listGames(params);
             case "observe" -> observeGame(params);
-            //case "join" -> joinGame(params);
+            case "join" -> joinGame(params);
             case "logout" -> logOut(params);
             case "quit" -> "quit";
             default -> help();
@@ -80,7 +87,6 @@ public class Client {
         if(params.length == 2) {
             LoginRequest req = new LoginRequest(params[0], params[1]);
             LoginResult res = server.login(req);
-            System.out.println("authToken: " + res.authToken());
             state = State.LOGGEDIN;
             return ("You logged in as " + res.username() + ". Type help to see more actions.\n");
         }
@@ -102,10 +108,19 @@ public class Client {
         if(params.length == 0) {
             ListResult res = server.listGames();
             ArrayList<GameData> games = res.games();
+
+            int count = 1;
             for (GameData game : games){
-                getAndDrawBoard(game);
+                gameMap.put(count, game);
+
+                out.print(SET_BG_COLOR_BLACK);
+                out.print(SET_TEXT_COLOR_MAGENTA);
+                out.println("Game " + count + ": " + game.gameName());
+                out.println("White player: " + game.whiteUsername());
+                out.println("Black player: " + game.blackUsername() + "\n");
+                count++;
             }
-            return ("You listed all the games: " + res);
+            return ("You listed all the games");
         }
         throw new ResponseException("Expected: list");
     }
@@ -115,44 +130,58 @@ public class Client {
         if(params.length == 1) {
             ListResult res = server.listGames();
             ArrayList<GameData> games = res.games();
-            for (GameData game : games){
-                if(matchID(game.gameID(), params)){
-                    getAndDrawBoard(game);
-                }
-            }
-            return ("You are observing game " + params[0]);
+            int id = Integer.parseInt(params[0]);
+            drawCurrentBoard(id, defaultPerspective);
+            return ("You are observing game " + id);
         }
         throw new ResponseException("Expected: <game ID>");
     }
 
-    private static void getAndDrawBoard(GameData game) {
+    private void drawCurrentBoard(int id, ChessBoard.ColorPerspective perspective) throws ResponseException {
+        try{
+            GameData currGame = gameMap.get(id);
+            getAndDrawBoard(currGame, perspective);
+        }
+        catch(Exception e){
+            throw new ResponseException("Game ID not found. Type 'list' to get a list of current games");
+        }
+    }
+
+    private static void getAndDrawBoard(GameData game, ChessBoard.ColorPerspective perspective) {
         ChessGame currGame = game.game();
         chess.ChessBoard chessClassBoard = currGame.getBoard();
-        ChessBoard uiBoard = new ChessBoard(chessClassBoard, WHITE_PLAYER);
+        ChessBoard uiBoard = new ChessBoard(out, chessClassBoard, perspective);
         uiBoard.drawBoard();
     }
 
-    private boolean matchID(int currID, String[] params){
-        try {
-            int targetID = Integer.parseInt(params[0]); // Convert string to int
-            if (targetID == currID) {
-                return true;
-            }
-        } catch (NumberFormatException e) {
-            System.out.println("Invalid game ID: " + params[0] + " is not a valid integer.");
-        }
-        return false;
-    }
+    private String joinGame(String[] params) throws ResponseException {
+        assertSignedIn();
+        int id = Integer.parseInt(params[0]);
+        String color = params[1];
 
-//    private String joinGame(String[] params) throws ResponseException {
-//        assertSignedIn();
-//        if(params.length == 2) {
-//            JoinRequest req = new JoinRequest(params[0], Integer.parseInt(params[1]));
-//            server.joinGame(req);
-//            return ("Your new game ID is: " + res.gameID());
-//        }
-//        throw new ResponseException(400, "Expected: <game name>");
-//    }
+        if(!color.equals("WHITE") && !color.equals("BLACK")){
+            throw new ResponseException("Expected: WHITE or BLACK");
+        }
+        else{
+            if(color.equals("WHITE")){
+                currPerspective = WHITE_PLAYER;
+            }
+            else{
+                currPerspective = BLACK_PLAYER;
+            }
+        }
+
+        if(params.length == 2) {
+            GameData currGame = gameMap.get(id);
+            int currId = currGame.gameID();
+
+            JoinRequest req = new JoinRequest(color, currId);
+            server.joinGame(req);
+            drawCurrentBoard(id, currPerspective);
+            return ("Game " + id + " joined.");
+        }
+        throw new ResponseException("Expected: <game ID> <WHITE/BLACK>");
+    }
 
     private String logOut(String[] params) throws ResponseException {
         assertSignedIn();

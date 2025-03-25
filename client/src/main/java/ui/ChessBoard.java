@@ -19,19 +19,20 @@ public class ChessBoard {
 
     private static chess.ChessBoard currBoard;
     private static ColorPerspective currPerspective;
+    private static PrintStream out;
 
     enum ColorPerspective{
         WHITE_PLAYER,
         BLACK_PLAYER
     }
 
-    public ChessBoard(chess.ChessBoard importedBoard, ColorPerspective playerColor) {
+    public ChessBoard(PrintStream out, chess.ChessBoard importedBoard, ColorPerspective playerColor) {
+        this.out = out;
         this.currBoard = importedBoard;
         this.currPerspective = playerColor;
     }
 
     public static void drawBoard() {
-        var out = new PrintStream(System.out, true, StandardCharsets.UTF_8);
         out.print(ERASE_SCREEN);
 
         drawHeaders(out, currPerspective);
