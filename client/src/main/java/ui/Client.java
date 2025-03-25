@@ -75,9 +75,7 @@ public class Client {
     private String register(String[] params) throws ResponseException {
         if(params.length == 3) {
             RegisterRequest req = new RegisterRequest(params[0], params[1], params[2]);
-            //System.out.println("in client, about to make request: " + req);
             RegisterResult res = server.register(req);
-            //System.out.println(res);
             return ("You registered as " + res.username());
         }
         throw new ResponseException("Expected: <username> <password> <email>");
@@ -98,7 +96,10 @@ public class Client {
         if(params.length == 1) {
             CreateRequest req = new CreateRequest(params[0]);
             CreateResult res = server.createGame(req);
-            return ("Your new game ID is: " + res.gameID());
+            ListResult list = server.listGames();
+            int id = gameMap.size() +1;
+            gameMap.put(id, list.games().getLast());
+            return ("Your new game ID is: " + id);
         }
         throw new ResponseException("Expected: <game name>");
     }
@@ -139,29 +140,34 @@ public class Client {
 
     private String joinGame(String[] params) throws ResponseException {
         assertSignedIn();
-        int id = Integer.parseInt(params[0]);
-        String color = params[1];
+        if(params.length == 2) {
+            int id = Integer.parseInt(params[0]);
+            String color = params[1];
 
-        if(!color.equals("WHITE") && !color.equals("BLACK")){
-            throw new ResponseException("Expected: WHITE or BLACK");
-        }
-        else{
-            if(color.equals("WHITE")){
-                currPerspective = WHITE_PLAYER;
+            if(!color.equals("WHITE") && !color.equals("BLACK")){
+                throw new ResponseException("Expected: WHITE or BLACK");
             }
             else{
-                currPerspective = BLACK_PLAYER;
+                if(color.equals("WHITE")){
+                    currPerspective = WHITE_PLAYER;
+                }
+                else{
+                    currPerspective = BLACK_PLAYER;
+                }
             }
-        }
-
-        if(params.length == 2) {
             GameData currGame = gameMap.get(id);
-            int currId = currGame.gameID();
+            System.out.println("id: " + id);
+            System.out.println("keys: " + gameMap.keySet());
+            System.out.println("currGame: " + gameMap.get(id));
+            if(gameMap.containsKey(id)){
+                int currId = currGame.gameID();
 
-            JoinRequest req = new JoinRequest(color, currId);
-            server.joinGame(req);
-            drawCurrentBoard(id, currPerspective);
-            return ("Game " + id + " joined.");
+                JoinRequest req = new JoinRequest(color, currId);
+                server.joinGame(req);
+                drawCurrentBoard(id, currPerspective);
+                return ("Game " + id + " joined.");
+            }
+            throw new ResponseException("Game not found. Please list games and try again.");
         }
         throw new ResponseException("Expected: <game ID> <WHITE/BLACK>");
     }

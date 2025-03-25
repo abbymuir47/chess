@@ -1,4 +1,4 @@
 package handlermodel;
 
-public record CreateResult(int gameID) {
+public record  CreateResult(int gameID) {
 }
