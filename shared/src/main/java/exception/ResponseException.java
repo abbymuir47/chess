@@ -21,4 +21,9 @@ public class ResponseException extends Exception {
         var message = new Gson().fromJson(new InputStreamReader(stream), ExceptionMessage.class);
         return new ResponseException(message.message());
     }
+
+    @Override
+    public String toString() {
+        return getMessage();
+    }
 }

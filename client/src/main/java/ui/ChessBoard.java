@@ -35,8 +35,6 @@ public class ChessBoard {
     public static void drawBoard() {
         out.print(ERASE_SCREEN);
 
-        out.print(currBoard);
-
         drawHeaders(out, currPerspective);
         drawChessBoard(out, currPerspective);
         drawHeaders(out, currPerspective);
@@ -73,10 +71,10 @@ public class ChessBoard {
 
         for (int boardRow = startRow; (perspective == ColorPerspective.WHITE_PLAYER ? boardRow >= endRow : boardRow <= endRow); boardRow += rowStep) {
             if (boardRow % 2 == 0) {
-                drawWhiteRowOfSquares(out, boardRow, perspective, startCol, endCol, colStep);
+                drawBlackRowOfSquares(out, boardRow, perspective, startCol, endCol, colStep);
             }
             else {
-                drawBlackRowOfSquares(out, boardRow, perspective, startCol, endCol, colStep);
+                drawWhiteRowOfSquares(out, boardRow, perspective, startCol, endCol, colStep);
             }
         }
     }
@@ -132,10 +130,6 @@ public class ChessBoard {
     }
 
     private static void drawPieces(PrintStream out, int boardRow, int boardCol) {
-        if (currPerspective == ColorPerspective.WHITE_PLAYER) {
-            boardCol = 9 - boardCol;
-        }
-
         ChessPosition currPos = new ChessPosition(boardRow, boardCol);
         ChessPiece currPiece = currBoard.getPiece(currPos);
         if(currPiece == null){
