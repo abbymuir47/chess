@@ -28,6 +28,11 @@ public class ServerFacade {
         return this.makeRequest("POST", path, req, LoginResult.class);
     }
 
+    public CreateResult createGame(CreateRequest req) throws ResponseException{
+        var path = "/game";
+        return this.makeRequest("POST", path, req, CreateResult.class);
+    }
+
     public ListResult listGames() throws ResponseException {
         var path = "/game";
         return this.makeRequest("GET", path, null, ListResult.class);

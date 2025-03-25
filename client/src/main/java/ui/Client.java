@@ -89,7 +89,12 @@ public class Client {
 
     private String createGame(String[] params) throws ResponseException {
         assertSignedIn();
-        return "create game request";
+        if(params.length == 1) {
+            CreateRequest req = new CreateRequest(params[0]);
+            CreateResult res = server.createGame(req);
+            return ("Your new game ID is: " + res.gameID());
+        }
+        throw new ResponseException(400, "Expected: <game name>");
     }
 
     private String listGames(String[] params) throws ResponseException {
@@ -117,7 +122,7 @@ public class Client {
             }
             return ("You are observing game " + params[0]);
         }
-        throw new ResponseException(400, "Expected: observe <game ID>");
+        throw new ResponseException(400, "Expected: <game ID>");
     }
 
     private static void getAndDrawBoard(GameData game) {
