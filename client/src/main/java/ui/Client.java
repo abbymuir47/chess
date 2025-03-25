@@ -58,7 +58,7 @@ public class Client {
             case "create" -> createGame(params);
             case "list" -> listGames(params);
             case "observe" -> observeGame(params);
-            case "join" -> joinGame(params);
+            //case "join" -> joinGame(params);
             case "logout" -> logOut(params);
             case "quit" -> "quit";
             default -> help();
@@ -73,7 +73,7 @@ public class Client {
             //System.out.println(res);
             return ("You registered as " + res.username());
         }
-        throw new ResponseException(400, "Expected: <username> <password> <email>");
+        throw new ResponseException("Expected: <username> <password> <email>");
     }
 
     private String login(String[] params) throws ResponseException {
@@ -84,7 +84,7 @@ public class Client {
             state = State.LOGGEDIN;
             return ("You logged in as " + res.username() + ". Type help to see more actions.\n");
         }
-        throw new ResponseException(400, "Expected: <username> <password>");
+        throw new ResponseException("Expected: <username> <password>");
     }
 
     private String createGame(String[] params) throws ResponseException {
@@ -94,7 +94,7 @@ public class Client {
             CreateResult res = server.createGame(req);
             return ("Your new game ID is: " + res.gameID());
         }
-        throw new ResponseException(400, "Expected: <game name>");
+        throw new ResponseException("Expected: <game name>");
     }
 
     private String listGames(String[] params) throws ResponseException {
@@ -107,7 +107,7 @@ public class Client {
             }
             return ("You listed all the games: " + res);
         }
-        throw new ResponseException(400, "Expected: list");
+        throw new ResponseException("Expected: list");
     }
 
     private String observeGame(String[] params) throws ResponseException {
@@ -122,7 +122,7 @@ public class Client {
             }
             return ("You are observing game " + params[0]);
         }
-        throw new ResponseException(400, "Expected: <game ID>");
+        throw new ResponseException("Expected: <game ID>");
     }
 
     private static void getAndDrawBoard(GameData game) {
@@ -144,14 +144,20 @@ public class Client {
         return false;
     }
 
-    private String joinGame(String[] params) throws ResponseException {
-        assertSignedIn();
-        return "join game request";
-    }
+//    private String joinGame(String[] params) throws ResponseException {
+//        assertSignedIn();
+//        if(params.length == 2) {
+//            JoinRequest req = new JoinRequest(params[0], Integer.parseInt(params[1]));
+//            server.joinGame(req);
+//            return ("Your new game ID is: " + res.gameID());
+//        }
+//        throw new ResponseException(400, "Expected: <game name>");
+//    }
 
     private String logOut(String[] params) throws ResponseException {
         assertSignedIn();
-        return "logout request";
+        state = State.LOGGEDOUT;
+        return "Logged out successfully";
     }
 
     public String help() {
@@ -178,7 +184,7 @@ public class Client {
 
     private void assertSignedIn() throws ResponseException {
         if (state == State.LOGGEDOUT) {
-            throw new ResponseException(400, "You must sign in");
+            throw new ResponseException("You must sign in");
         }
     }
 }

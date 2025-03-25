@@ -1,4 +1,4 @@
-package dataaccess;
+package exception;
 
 public record ExceptionMessage(String message) {
 }

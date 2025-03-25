@@ -12,6 +12,7 @@ import java.net.URL;
 public class ServerFacade {
 
     private final String serverUrl;
+    private String authToken;
 
     public ServerFacade(String url) {
         serverUrl = url;
@@ -20,12 +21,16 @@ public class ServerFacade {
     public RegisterResult register(RegisterRequest req) throws ResponseException {
         var path = "/user";
         //System.out.println("about to make register request from serverfacade, req:" + req);
-        return this.makeRequest("POST", path, req, RegisterResult.class);
+        RegisterResult res = this.makeRequest("POST", path, req, RegisterResult.class);
+        authToken = res.authToken();
+        return res;
     }
 
     public LoginResult login(LoginRequest req) throws ResponseException {
         var path = "/session";
-        return this.makeRequest("POST", path, req, LoginResult.class);
+        LoginResult res = makeRequest("POST", path, req, LoginResult.class);
+        authToken = res.authToken();
+        return res;
     }
 
     public CreateResult createGame(CreateRequest req) throws ResponseException{
@@ -38,6 +43,11 @@ public class ServerFacade {
         return this.makeRequest("GET", path, null, ListResult.class);
     }
 
+    public Object joinGame(JoinRequest req) throws ResponseException{
+        var path = "/game";
+        return this.makeRequest("PUT", path, req, Object.class);
+    }
+
     private <T> T makeRequest(String method, String path, Object request, Class<T> responseClass) throws ResponseException {
         try {
             URL url = (new URI(serverUrl + path)).toURL();
@@ -45,6 +55,10 @@ public class ServerFacade {
             HttpURLConnection http = (HttpURLConnection) url.openConnection();
             http.setRequestMethod(method);
             http.setDoOutput(true);
+
+            if (authToken != null && !authToken.isEmpty()) {
+                http.setRequestProperty("authorization", authToken);
+            }
 
             writeBody(request, http);
             http.connect();
@@ -56,7 +70,7 @@ public class ServerFacade {
         } catch (ResponseException ex) {
             throw ex;
         } catch (Exception ex) {
-            throw new ResponseException(500, ex.getMessage());
+            throw new ResponseException(ex.getMessage());
         }
     }
 
@@ -82,7 +96,7 @@ public class ServerFacade {
                     throw ResponseException.fromJson(respErr);
                 }
             }
-            throw new ResponseException(status, "other failure: " + status);
+            throw new ResponseException("other failure");
         }
     }
 
