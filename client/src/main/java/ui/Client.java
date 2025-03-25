@@ -1,16 +1,20 @@
 package ui;
 
+import chess.ChessGame;
 import exception.ResponseException;
 import handlermodel.*;
+import model.GameData;
 import server.ServerFacade;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Scanner;
+
+import static ui.ChessBoard.ColorPerspective.*;
 import static ui.EscapeSequences.*;
 
 public class Client {
 
-    private String visitorName = null;
     private final ServerFacade server;
     private final String serverUrl;
     private State state = State.LOGGEDOUT;
@@ -91,8 +95,11 @@ public class Client {
     private String listGames(String[] params) throws ResponseException {
         assertSignedIn();
         if(params.length == 0) {
-            //ListResult(ArrayList<GameData> games)
             ListResult res = server.listGames();
+            ArrayList<GameData> games = res.games();
+            for (GameData game : games){
+                getAndDrawBoard(game);
+            }
             return ("You listed all the games: " + res);
         }
         throw new ResponseException(400, "Expected: list");
@@ -100,7 +107,36 @@ public class Client {
 
     private String observeGame(String[] params) throws ResponseException {
         assertSignedIn();
-        return "observe game request";
+        if(params.length == 1) {
+            ListResult res = server.listGames();
+            ArrayList<GameData> games = res.games();
+            for (GameData game : games){
+                if(matchID(game.gameID(), params)){
+                    getAndDrawBoard(game);
+                }
+            }
+            return ("You are observing game " + params[0]);
+        }
+        throw new ResponseException(400, "Expected: observe <game ID>");
+    }
+
+    private static void getAndDrawBoard(GameData game) {
+        ChessGame currGame = game.game();
+        chess.ChessBoard chessClassBoard = currGame.getBoard();
+        ChessBoard uiBoard = new ChessBoard(chessClassBoard, WHITE_PLAYER);
+        uiBoard.drawBoard();
+    }
+
+    private boolean matchID(int currID, String[] params){
+        try {
+            int targetID = Integer.parseInt(params[0]); // Convert string to int
+            if (targetID == currID) {
+                return true;
+            }
+        } catch (NumberFormatException e) {
+            System.out.println("Invalid game ID: " + params[0] + " is not a valid integer.");
+        }
+        return false;
     }
 
     private String joinGame(String[] params) throws ResponseException {

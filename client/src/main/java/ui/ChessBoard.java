@@ -17,20 +17,22 @@ public class ChessBoard {
     // Board dimensions.
     private static final int BOARD_SIZE_IN_SQUARES = 8;
 
-    private static Random rand = new Random();
-    private static chess.ChessBoard exampleBoard = new chess.ChessBoard();
+    private static chess.ChessBoard currBoard;
+    private static ColorPerspective currPerspective;
 
     enum ColorPerspective{
         WHITE_PLAYER,
         BLACK_PLAYER
     }
 
-    public static void main(String[] args) {
+    public ChessBoard(chess.ChessBoard importedBoard, ColorPerspective playerColor) {
+        this.currBoard = importedBoard;
+        this.currPerspective = playerColor;
+    }
+
+    public static void drawBoard() {
         var out = new PrintStream(System.out, true, StandardCharsets.UTF_8);
         out.print(ERASE_SCREEN);
-
-        exampleBoard.resetBoard();
-        ColorPerspective currPerspective = ColorPerspective.BLACK_PLAYER;
 
         drawHeaders(out, currPerspective);
         drawChessBoard(out, currPerspective);
@@ -123,7 +125,7 @@ public class ChessBoard {
 
     private static void drawPieces(PrintStream out, int boardRow, int boardCol) {
         ChessPosition currPos = new ChessPosition(boardRow, boardCol);
-        ChessPiece currPiece = exampleBoard.getPiece(currPos);
+        ChessPiece currPiece = currBoard.getPiece(currPos);
         if(currPiece == null){
             out.print("   ");
         }

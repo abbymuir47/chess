@@ -123,7 +123,6 @@ public class Server {
         return "";
     }
 
-
     public boolean checkAuth (String authToken) throws DataAccessException {
         try{
             AuthData data = authDataAccess.getAuth(authToken);

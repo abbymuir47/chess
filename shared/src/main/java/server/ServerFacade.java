@@ -36,17 +36,17 @@ public class ServerFacade {
     private <T> T makeRequest(String method, String path, Object request, Class<T> responseClass) throws ResponseException {
         try {
             URL url = (new URI(serverUrl + path)).toURL();
-            //System.out.println("current url:" + url);
+            System.out.println("current url:" + url);
             HttpURLConnection http = (HttpURLConnection) url.openConnection();
             http.setRequestMethod(method);
             http.setDoOutput(true);
 
             writeBody(request, http);
             http.connect();
-            //System.out.println("successfully connected");
+            System.out.println("successfully connected");
             throwIfNotSuccessful(http);
 
-            //System.out.println("about to readBody");
+            System.out.println("about to readBody");
             return readBody(http, responseClass);
         } catch (ResponseException ex) {
             throw ex;
@@ -58,7 +58,7 @@ public class ServerFacade {
     private static void writeBody(Object request, HttpURLConnection http) throws IOException {
         if (request != null) {
             http.addRequestProperty("Content-Type", "application/json");
-            //System.out.println("in writeBody, request:" + request);
+            System.out.println("in writeBody, request:" + request);
             String reqData = new Gson().toJson(request);
             try (OutputStream reqBody = http.getOutputStream()) {
                 reqBody.write(reqData.getBytes());
@@ -67,11 +67,12 @@ public class ServerFacade {
     }
 
     private void throwIfNotSuccessful(HttpURLConnection http) throws IOException, ResponseException {
-        //System.out.println("in throwIfNotSuccessful");
+        System.out.println("in throwIfNotSuccessful");
         var status = http.getResponseCode();
         if (!isSuccessful(status)) {
-            //System.out.println("not successful, status:" + status);
+            System.out.println("not successful, status:" + status);
             try (InputStream respErr = http.getErrorStream()) {
+                System.out.println("respErr:" + respErr);
                 if (respErr != null) {
                     throw ResponseException.fromJson(respErr);
                 }
@@ -82,12 +83,12 @@ public class ServerFacade {
 
     private static <T> T readBody(HttpURLConnection http, Class<T> responseClass) throws IOException {
         T response = null;
-        //System.out.println("in readBody");
+        System.out.println("in readBody");
         if (http.getContentLength() < 0) {
             try (InputStream respBody = http.getInputStream()) {
                 InputStreamReader reader = new InputStreamReader(respBody);
                 if (responseClass != null) {
-                    //System.out.println("about to form response");
+                    System.out.println("about to form response");
                     response = new Gson().fromJson(reader, responseClass);
                 }
             }
