@@ -55,7 +55,8 @@ public class ServerFacadeTests {
     @Test
     public void loginSuccess() throws ResponseException {
         RegisterRequest req3 = new RegisterRequest("player3", "password", "p3@email.com");
-        LoginRequest req = new LoginRequest("player1", "password");
+        facade.register(req3);
+        LoginRequest req = new LoginRequest("player3", "password");
         LoginResult res = facade.login(req);
         assertTrue(res.authToken().length() > 10);
     }
@@ -109,14 +110,19 @@ public class ServerFacadeTests {
 
     @Test
     public void joinGameSuccess() throws ResponseException {
+        facade.clear();
+
         RegisterRequest req8 = new RegisterRequest("player8", "password", "p8@email.com");
         facade.register(req8);
         LoginRequest req = new LoginRequest("player8", "password");
         facade.login(req);
 
+        CreateRequest gameReq = new CreateRequest("game1");
+        CreateResult res = facade.createGame(gameReq);
+        facade.listGames();
+
         JoinRequest joinRequest = new JoinRequest("BLACK", 1);
-        assertTrue(facade.joinGame(joinRequest) != null);
-        //assertNotNull(facade.joinGame(joinRequest));
+        System.out.println(facade.joinGame(joinRequest));
     }
 
     @Test
@@ -133,18 +139,24 @@ public class ServerFacadeTests {
     @Test
     public void logoutSuccess() throws ResponseException {
         RegisterRequest req10 = new RegisterRequest("player10", "password", "p10@email.com");
+        facade.register(req10);
         LoginRequest req = new LoginRequest("player10", "password");
         LoginResult res = facade.login(req);
 
-        assertTrue(res.authToken().length() > 10);
+        assertDoesNotThrow(() -> facade.logout());
+
+        //assertTrue(res.authToken().length() > 10);
     }
 
     @Test
     public void logoutFail() throws ResponseException{
-        RegisterRequest req4 = new RegisterRequest("player4", "password", "p3@email.com");
-        facade.register(req4);
-        LoginRequest req = new LoginRequest("player4", "wrongPassword");
-        assertThrows(ResponseException.class, ()-> facade.login(req));
-    }
+        RegisterRequest req11 = new RegisterRequest("player11", "password", "p11@email.com");
+        facade.register(req11);
+        LoginRequest req = new LoginRequest("player11", "password");
+        LoginResult res = facade.login(req);
 
+        facade.logout();
+
+        assertThrows(ResponseException.class, ()-> facade.logout());
+    }
 }

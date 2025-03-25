@@ -30,10 +30,13 @@ public class GameService {
 
     public CreateResult creategame(CreateRequest createRequest) throws DataAccessException {
         ChessGame chessGame = new ChessGame();
-        GameData game = new GameData(0, null, null, createRequest.gameName(), chessGame);
-        GameData insertedGame = gameDataAccess.createGame(game);
-        CreateResult result = new CreateResult(insertedGame.gameID());
-        return result;
+        if(createRequest.gameName()!=null){
+            GameData game = new GameData(0, null, null, createRequest.gameName(), chessGame);
+            GameData insertedGame = gameDataAccess.createGame(game);
+            CreateResult result = new CreateResult(insertedGame.gameID());
+            return result;
+        }
+        throw new DataAccessException(400, "Error: bad request");
     }
 
     public void joingame(JoinRequest joinRequest, String username) throws DataAccessException {
