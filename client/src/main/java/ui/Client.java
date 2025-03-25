@@ -137,23 +137,6 @@ public class Client {
         throw new ResponseException("Expected: <game ID>");
     }
 
-    private void drawCurrentBoard(int id, ChessBoard.ColorPerspective perspective) throws ResponseException {
-        try{
-            GameData currGame = gameMap.get(id);
-            getAndDrawBoard(currGame, perspective);
-        }
-        catch(Exception e){
-            throw new ResponseException("Game ID not found. Type 'list' to get a list of current games");
-        }
-    }
-
-    private static void getAndDrawBoard(GameData game, ChessBoard.ColorPerspective perspective) {
-        ChessGame currGame = game.game();
-        chess.ChessBoard chessClassBoard = currGame.getBoard();
-        ChessBoard uiBoard = new ChessBoard(out, chessClassBoard, perspective);
-        uiBoard.drawBoard();
-    }
-
     private String joinGame(String[] params) throws ResponseException {
         assertSignedIn();
         int id = Integer.parseInt(params[0]);
@@ -215,5 +198,22 @@ public class Client {
         if (state == State.LOGGEDOUT) {
             throw new ResponseException("You must sign in");
         }
+    }
+
+    private void drawCurrentBoard(int id, ChessBoard.ColorPerspective perspective) throws ResponseException {
+        try{
+            GameData currGame = gameMap.get(id);
+            getAndDrawBoard(currGame, perspective);
+        }
+        catch(Exception e){
+            throw new ResponseException("Game ID not found. Type 'list' to get a list of current games");
+        }
+    }
+
+    private static void getAndDrawBoard(GameData game, ChessBoard.ColorPerspective perspective) {
+        ChessGame currGame = game.game();
+        chess.ChessBoard chessClassBoard = currGame.getBoard();
+        ChessBoard uiBoard = new ChessBoard(out, chessClassBoard, perspective);
+        uiBoard.drawBoard();
     }
 }
