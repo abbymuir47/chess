@@ -168,6 +168,7 @@ public class Client {
                     JoinRequest req = new JoinRequest(color, currId);
                     server.joinGame(req);
                     drawCurrentBoard(id, currPerspective);
+                    state = State.INGAME;
                     return ("Game " + id + " joined.");
                 }
                 throw new ResponseException("Game not found. Please list games and try again.");
@@ -199,7 +200,8 @@ public class Client {
                     Help menu: "help"
                     """;
         }
-        return """
+        else if (state == State.LOGGEDIN) {
+            return """
                 Please select an option:
                 Create a game: enter "create <game name>"
                 List games: enter "list"
@@ -209,6 +211,20 @@ public class Client {
                 Quit: "quit"
                 Help menu: "help"
                 """;
+        }
+        else if (state == State.INGAME){
+            return """
+                Please select an option:
+                Redraw board: enter "redraw"
+                Make move: enter move in the form "move c1c2 -> Queen" where -> Queen is for pawn promotion and can be any piece
+                Highlight legal moves: enter "highlight c1"
+                Resign: enter "resign"
+                Leave game: "leave"
+                Quit: "quit"
+                Help menu: "help"
+                """;
+        }
+        return "";
     }
 
     private void assertSignedIn() throws ResponseException {
