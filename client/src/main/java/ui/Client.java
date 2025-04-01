@@ -67,6 +67,11 @@ public class Client {
             case "observe" -> observeGame(params);
             case "join" -> joinGame(params);
             case "logout" -> logout(params);
+            case "redraw" -> redraw(params);
+            case "move" -> makeMove(params);
+            case "highlight" -> highlightMoves(params);
+            case "resign" -> resign(params);
+            case "leave" -> leaveGame(params);
             case "quit" -> "quit";
             default -> help();
         };
@@ -188,6 +193,26 @@ public class Client {
             return "Logged out successfully";
         }
         throw new ResponseException("Expected: logout");
+    }
+
+    private String redraw(String[] params) throws ResponseException {
+        return "redraw board";
+    }
+
+    private String makeMove(String[] params) throws ResponseException {
+        return "making move";
+    }
+
+    private String highlightMoves(String[] params) throws ResponseException {
+        return "highlight moves";
+    }
+
+    private String resign(String[] params) throws ResponseException {
+        return "resign";
+    }
+
+    private String leaveGame(String[] params) throws ResponseException {
+        return "leave game";
     }
 
     public String help() {
