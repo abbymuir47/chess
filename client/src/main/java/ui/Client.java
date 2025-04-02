@@ -212,29 +212,8 @@ public class Client {
             int row;
             int col;
 
-            if (req.charAt(0) == 'a'){col = 1;}
-            else if (req.charAt(0) == 'b') {col = 2;}
-            else if (req.charAt(0) == 'c') {col = 3;}
-            else if (req.charAt(0) == 'd') {col = 4;}
-            else if (req.charAt(0) == 'e') {col = 5;}
-            else if (req.charAt(0) == 'f') {col = 6;}
-            else if (req.charAt(0) == 'g') {col = 7;}
-            else if (req.charAt(0) == 'h') {col = 8;}
-            else {
-                throw new ResponseException("Please enter the square in form [abcdefgh][12345678]");
-            }
-
-            if (req.charAt(1) == '1'){row = 1;}
-            else if (req.charAt(1) == '2') {row = 2;}
-            else if (req.charAt(1) == '3') {row = 3;}
-            else if (req.charAt(1) == '4') {row = 4;}
-            else if (req.charAt(1) == '5') {row = 5;}
-            else if (req.charAt(1) == '6') {row = 6;}
-            else if (req.charAt(1) == '7') {row = 7;}
-            else if (req.charAt(1) == '8') {row = 8;}
-            else {
-                throw new ResponseException("Please enter the square in form [abcdefgh][12345678]");
-            }
+            col = getCol(req);
+            row = getRow(req);
 
             ChessPosition pos = new ChessPosition(row,col);
             ChessGame chessGame = currGame.game();
@@ -249,14 +228,44 @@ public class Client {
                 positions[i][0] = potentialMove.getRow();
                 positions[i][1] = potentialMove.getColumn();
                 i++;
-                System.out.println("positions, currently: " + Arrays.deepToString(positions));
             }
-            System.out.println("about to print board, positions: " + Arrays.deepToString(positions));
             drawCurrentBoard(currGame.gameID(), currPerspective, positions);
 
             return ("You highlighted moves for " + req + "\n" + "moves: " + moves);
         }
         throw new ResponseException("Expected form: highlight <a1>");
+    }
+
+    private static int getRow(String req) throws ResponseException {
+        int row;
+        if (req.charAt(1) == '1'){row = 1;}
+        else if (req.charAt(1) == '2') {row = 2;}
+        else if (req.charAt(1) == '3') {row = 3;}
+        else if (req.charAt(1) == '4') {row = 4;}
+        else if (req.charAt(1) == '5') {row = 5;}
+        else if (req.charAt(1) == '6') {row = 6;}
+        else if (req.charAt(1) == '7') {row = 7;}
+        else if (req.charAt(1) == '8') {row = 8;}
+        else {
+            throw new ResponseException("Please enter the square in form [abcdefgh][12345678]");
+        }
+        return row;
+    }
+
+    private static int getCol(String req) throws ResponseException {
+        int col;
+        if (req.charAt(0) == 'a'){col = 1;}
+        else if (req.charAt(0) == 'b') {col = 2;}
+        else if (req.charAt(0) == 'c') {col = 3;}
+        else if (req.charAt(0) == 'd') {col = 4;}
+        else if (req.charAt(0) == 'e') {col = 5;}
+        else if (req.charAt(0) == 'f') {col = 6;}
+        else if (req.charAt(0) == 'g') {col = 7;}
+        else if (req.charAt(0) == 'h') {col = 8;}
+        else {
+            throw new ResponseException("Please enter the square in form [abcdefgh][12345678]");
+        }
+        return col;
     }
 
     private String resign(String[] params) throws ResponseException {
