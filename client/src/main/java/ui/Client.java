@@ -1,6 +1,8 @@
 package ui;
 
 import chess.ChessGame;
+import chess.ChessMove;
+import chess.ChessPosition;
 import exception.ResponseException;
 import handlermodel.*;
 import model.GameData;
@@ -21,6 +23,7 @@ public class Client {
     private final String serverUrl;
     private State state = State.LOGGEDOUT;
     private Map<Integer, GameData> gameMap = new HashMap<>();
+    private GameData currGame;
     private static PrintStream out;
     private ChessBoard.ColorPerspective defaultPerspective = WHITE_PLAYER;
     private ChessBoard.ColorPerspective currPerspective;
@@ -139,7 +142,7 @@ public class Client {
             ArrayList<GameData> games = res.games();
             try{
                 int id = Integer.parseInt(params[0]);
-                drawCurrentBoard(id, defaultPerspective);
+                drawCurrentBoard(id, defaultPerspective, null);
                 return ("You are observing game " + id);
             } catch (NumberFormatException e) {
                 throw new ResponseException("Please input an integer as gameID");
@@ -166,13 +169,13 @@ public class Client {
                         currPerspective = BLACK_PLAYER;
                     }
                 }
-                GameData currGame = gameMap.get(id);
+                currGame = gameMap.get(id);
                 if(gameMap.containsKey(id)){
                     int currId = currGame.gameID();
 
                     JoinRequest req = new JoinRequest(color, currId);
                     server.joinGame(req);
-                    drawCurrentBoard(id, currPerspective);
+                    drawCurrentBoard(id, currPerspective, null);
                     state = State.INGAME;
                     return ("Game " + id + " joined.");
                 }
@@ -204,7 +207,56 @@ public class Client {
     }
 
     private String highlightMoves(String[] params) throws ResponseException {
-        return "highlight moves";
+        if(params.length == 1) {
+            String req = params[0];
+            int row;
+            int col;
+
+            if (req.charAt(0) == 'a'){col = 1;}
+            else if (req.charAt(0) == 'b') {col = 2;}
+            else if (req.charAt(0) == 'c') {col = 3;}
+            else if (req.charAt(0) == 'd') {col = 4;}
+            else if (req.charAt(0) == 'e') {col = 5;}
+            else if (req.charAt(0) == 'f') {col = 6;}
+            else if (req.charAt(0) == 'g') {col = 7;}
+            else if (req.charAt(0) == 'h') {col = 8;}
+            else {
+                throw new ResponseException("Please enter the square in form [abcdefgh][12345678]");
+            }
+
+            if (req.charAt(1) == '1'){row = 1;}
+            else if (req.charAt(1) == '2') {row = 2;}
+            else if (req.charAt(1) == '3') {row = 3;}
+            else if (req.charAt(1) == '4') {row = 4;}
+            else if (req.charAt(1) == '5') {row = 5;}
+            else if (req.charAt(1) == '6') {row = 6;}
+            else if (req.charAt(1) == '7') {row = 7;}
+            else if (req.charAt(1) == '8') {row = 8;}
+            else {
+                throw new ResponseException("Please enter the square in form [abcdefgh][12345678]");
+            }
+
+            ChessPosition pos = new ChessPosition(row,col);
+            ChessGame chessGame = currGame.game();
+
+            Collection<ChessMove> moves = chessGame.validMoves(pos);
+            int numMoves = moves.size();
+            int[][] positions = new int[numMoves][2];
+            int i=0;
+
+            for (ChessMove move: moves){
+                ChessPosition potentialMove = move.getEndPosition();
+                positions[i][0] = potentialMove.getRow();
+                positions[i][1] = potentialMove.getColumn();
+                i++;
+                System.out.println("positions, currently: " + Arrays.deepToString(positions));
+            }
+            System.out.println("about to print board, positions: " + Arrays.deepToString(positions));
+            drawCurrentBoard(currGame.gameID(), currPerspective, positions);
+
+            return ("You highlighted moves for " + req + "\n" + "moves: " + moves);
+        }
+        throw new ResponseException("Expected form: highlight <a1>");
     }
 
     private String resign(String[] params) throws ResponseException {
@@ -258,20 +310,21 @@ public class Client {
         }
     }
 
-    private void drawCurrentBoard(int id, ChessBoard.ColorPerspective perspective) throws ResponseException {
+    private void drawCurrentBoard(int id, ChessBoard.ColorPerspective perspective, int[][] highlights) throws ResponseException {
         try{
             GameData currGame = gameMap.get(id);
-            getAndDrawBoard(currGame, perspective);
+            getAndDrawBoard(currGame, perspective, highlights);
         }
         catch(Exception e){
             throw new ResponseException("Game ID not found. Type 'list' to get a list of current games");
         }
     }
 
-    private static void getAndDrawBoard(GameData game, ChessBoard.ColorPerspective perspective) {
+    private static void getAndDrawBoard(GameData game, ChessBoard.ColorPerspective perspective, int[][] highlights) {
+        System.out.println("in getanddrawboard, highlights: " + Arrays.deepToString(highlights));
         ChessGame currGame = game.game();
         chess.ChessBoard chessClassBoard = currGame.getBoard();
-        ChessBoard uiBoard = new ChessBoard(out, chessClassBoard, perspective);
+        ChessBoard uiBoard = new ChessBoard(out, chessClassBoard, perspective, highlights);
         uiBoard.drawBoard();
     }
 }

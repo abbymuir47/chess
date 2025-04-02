@@ -6,6 +6,8 @@ import chess.ChessPosition;
 
 import java.io.PrintStream;
 import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Random;
 
 import static chess.ChessGame.TeamColor.*;
@@ -20,20 +22,28 @@ public class ChessBoard {
     private static chess.ChessBoard currBoard;
     private static ColorPerspective currPerspective;
     private static PrintStream out;
+    private static int[][] highlights;
 
     enum ColorPerspective{
         WHITE_PLAYER,
         BLACK_PLAYER
     }
 
-    public ChessBoard(PrintStream out, chess.ChessBoard importedBoard, ColorPerspective playerColor) {
+    public ChessBoard(PrintStream out, chess.ChessBoard importedBoard, ColorPerspective playerColor, int[][] highlights) {
         this.out = out;
         this.currBoard = importedBoard;
         this.currPerspective = playerColor;
+        this.highlights = highlights;
     }
 
     public static void drawBoard() {
         out.print(ERASE_SCREEN);
+
+        if(highlights != null){
+            System.out.println("highlights not null, highlights: " + Arrays.deepToString(highlights));
+        }else{
+            System.out.println("highlights null");
+        }
 
         drawHeaders(out, currPerspective);
         drawChessBoard(out, currPerspective);
@@ -120,12 +130,35 @@ public class ChessBoard {
     }
 
     private static void drawWhiteSquare(PrintStream out, int boardRow, int boardCol) {
-        out.print(SET_BG_COLOR_LIGHT_GREY);
+        if(highlights != null) {
+            for (int i = 0; i < highlights.length; i++) {
+                if (highlights[i][0] == boardRow && highlights[i][1] == boardCol) {
+                    out.print(SET_BG_COLOR_YELLOW);
+                } else {
+                    out.print(SET_BG_COLOR_LIGHT_GREY);
+                }
+            }
+        }
+        else{
+            out.print(SET_BG_COLOR_LIGHT_GREY);
+        }
+
         drawPieces(out, boardRow, boardCol);
     }
 
     private static void drawBlackSquare(PrintStream out, int boardRow, int boardCol) {
-        out.print(SET_BG_COLOR_DARK_GREY);
+        if(highlights != null) {
+            for (int i = 0; i < highlights.length; i++) {
+                if (highlights[i][0] == boardRow && highlights[i][1] == boardCol) {
+                    out.print(SET_BG_COLOR_YELLOW);
+                } else {
+                    out.print(SET_BG_COLOR_DARK_GREY);
+                }
+            }
+        }
+        else{
+            out.print(SET_BG_COLOR_DARK_GREY);
+        }
         drawPieces(out, boardRow, boardCol);
     }
 
