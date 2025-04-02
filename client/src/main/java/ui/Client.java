@@ -199,7 +199,11 @@ public class Client {
     }
 
     private String redraw(String[] params) throws ResponseException {
-        return "redraw board";
+        if(params.length == 0){
+            drawCurrentBoard(currGame.gameID(), currPerspective, null);
+            return "board redrawn";
+        }
+        throw new ResponseException("Expected: redraw");
     }
 
     private String makeMove(String[] params) throws ResponseException {
@@ -330,7 +334,6 @@ public class Client {
     }
 
     private static void getAndDrawBoard(GameData game, ChessBoard.ColorPerspective perspective, int[][] highlights) {
-        System.out.println("in getanddrawboard, highlights: " + Arrays.deepToString(highlights));
         ChessGame currGame = game.game();
         chess.ChessBoard chessClassBoard = currGame.getBoard();
         ChessBoard uiBoard = new ChessBoard(out, chessClassBoard, perspective, highlights);
