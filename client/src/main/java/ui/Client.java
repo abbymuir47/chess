@@ -207,17 +207,26 @@ public class Client {
     }
 
     private String makeMove(String[] params) throws ResponseException {
-        return "making move";
+        if(params.length == 1){
+            String req = params[0];
+            int startRow = getRow(req.substring(0,2));
+            int startCol = getCol(req.substring(0,2));
+            int endRow = getRow(req.substring(2,4));
+            int endCol = getCol(req.substring(2,4));
+            return ("startRow " + startRow + " startCol: " + startCol + " endRow: " + endRow + " endCol: " + endCol);
+        }
+        else if(params.length == 3){
+            return "placeholder for when pawn promotion is included";
+        }
+        throw new ResponseException("Expected: move <c1c2> -> <Queen>");
     }
 
     private String highlightMoves(String[] params) throws ResponseException {
         if(params.length == 1) {
             String req = params[0];
-            int row;
-            int col;
 
-            col = getCol(req);
-            row = getRow(req);
+            int row = getRow(req);
+            int col = getCol(req);
 
             ChessPosition pos = new ChessPosition(row,col);
             ChessGame chessGame = currGame.game();
