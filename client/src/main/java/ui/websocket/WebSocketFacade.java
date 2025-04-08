@@ -4,11 +4,19 @@ import com.google.gson.Gson;
 import exception.ResponseException;
 import websocket.messages.ServerMessage;
 
+import javax.websocket.*;
+import javax.websocket.ContainerProvider;
+import javax.websocket.WebSocketContainer;
+import javax.websocket.Endpoint;
+import javax.websocket.MessageHandler;
+import javax.websocket.Session;
+import javax.websocket.EndpointConfig;
+
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
 
-public class WebSocketFacade {
+public class WebSocketFacade extends Endpoint{
 
     Session session;
     ServerMessageObserver serverMessageObserver;
