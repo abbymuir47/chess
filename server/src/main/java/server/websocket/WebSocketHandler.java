@@ -7,6 +7,10 @@ import model.AuthData;
 import org.eclipse.jetty.websocket.api.*;
 import org.eclipse.jetty.websocket.api.annotations.OnWebSocketMessage;
 import websocket.commands.UserGameCommand;
+import websocket.messages.ErrorMessage;
+import websocket.messages.ServerMessage;
+
+import java.io.IOException;
 
 public class WebSocketHandler {
 
@@ -15,7 +19,7 @@ public class WebSocketHandler {
     public SqlAuthDataAccess sqlAuthDataAccess;
 
     @OnWebSocketMessage
-    public void onMessage(Session session, String message) {
+    public void onMessage(Session session, String message) throws IOException {
         try {
             UserGameCommand command = gson.fromJson(message, UserGameCommand.class);
 
@@ -24,7 +28,7 @@ public class WebSocketHandler {
             String username = auth.username();
             int gameID = command.getGameID();
 
-            connections.add(username, session);
+            connections.add(gameID, username, session);
 
             switch (command.getCommandType()) {
                 case CONNECT -> connect(session, username, command);
@@ -32,12 +36,8 @@ public class WebSocketHandler {
                 case LEAVE -> leaveGame(session, username, command);
                 case RESIGN -> resign(session, username, command);
             }
-        } catch (ResponseException ex) {
-            // Serializes and sends the error message
-            sendMessage(session.getRemote(), new ErrorMessage("Error: unauthorized"));
         } catch (Exception ex) {
-            ex.printStackTrace();
-            sendMessage(session.getRemote(), new ErrorMessage("Error: " + ex.getMessage()));
+            connections.sendMessage(session, new ErrorMessage(ServerMessage.ServerMessageType.ERROR, "Error: " + ex.getMessage()));
         }
     }
 

@@ -1,7 +1,10 @@
 package server.websocket;
 
 import org.eclipse.jetty.websocket.api.Session;
+import websocket.messages.ServerMessage;
 
+import java.io.IOException;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -19,4 +22,14 @@ public class ConnectionManager {
     public void remove(int gameID) {
         connections.remove(gameID);
     }
+
+    public void sendMessage(Session session, ServerMessage message) throws IOException {
+        var removeList = new ArrayList<Connection>();
+        for (var c : connections.values()) {
+            if (c.session.isOpen()) {
+                c.session.getRemote().sendPong(message.toString());
+            }
+        }
+    }
+
 }
