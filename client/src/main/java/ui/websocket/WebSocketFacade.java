@@ -2,6 +2,7 @@ package ui.websocket;
 
 import com.google.gson.Gson;
 import exception.ResponseException;
+import websocket.messages.ServerMessage;
 
 import java.io.IOException;
 import java.net.URI;
@@ -10,13 +11,13 @@ import java.net.URISyntaxException;
 public class WebSocketFacade {
 
     Session session;
-    NotificationHandler notificationHandler;
+    ServerMessageObserver serverMessageObserver;
 
-    public WebSocketFacade(String url, NotificationHandler notificationHandler) throws ResponseException {
+    public WebSocketFacade(String url, ServerMessageObserver serverMessageObserver) throws ResponseException {
         try {
             url = url.replace("http", "ws");
             URI socketURI = new URI(url + "/ws");
-            this.notificationHandler = notificationHandler;
+            this.serverMessageObserver = serverMessageObserver;
 
             WebSocketContainer container = ContainerProvider.getWebSocketContainer();
             this.session = container.connectToServer(this, socketURI);
@@ -25,8 +26,13 @@ public class WebSocketFacade {
             this.session.addMessageHandler(new MessageHandler.Whole<String>() {
                 @Override
                 public void onMessage(String message) {
-                    Notification notification = new Gson().fromJson(message, Notification.class);
-                    notificationHandler.notify(notification);
+                    try {
+                        ServerMessage message =
+                                gson.fromJson(message, ServerMessage.class);
+                        observer.notify(message);
+                    } catch(Exception ex) {
+                        observer.notify(new ErrorMessage(ex.getMessage()));
+                    }
                 }
             });
         } catch (DeploymentException | IOException | URISyntaxException ex) {
@@ -39,23 +45,17 @@ public class WebSocketFacade {
     public void onOpen(Session session, EndpointConfig endpointConfig) {
     }
 
-    public void enterPetShop(String visitorName) throws ResponseException {
-        try {
-            var action = new Action(Action.Type.ENTER, visitorName);
-            this.session.getBasicRemote().sendText(new Gson().toJson(action));
-        } catch (IOException ex) {
-            throw new ResponseException(500, ex.getMessage());
-        }
-    }
+    /*
+    public void onMessage(String message) {
+  try {
+    ServerMessage message =
+        gson.fromJson(message, ServerMessage.class);
+    observer.notify(message);
+  } catch(Exception ex) {
+    observer.notify(new ErrorMessage(ex.getMessage()));
+  }
+}
 
-    public void leavePetShop(String visitorName) throws ResponseException {
-        try {
-            var action = new Action(Action.Type.EXIT, visitorName);
-            this.session.getBasicRemote().sendText(new Gson().toJson(action));
-            this.session.close();
-        } catch (IOException ex) {
-            throw new ResponseException(500, ex.getMessage());
-        }
-    }
+     */
 
 }

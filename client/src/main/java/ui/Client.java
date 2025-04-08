@@ -7,6 +7,8 @@ import exception.ResponseException;
 import handlermodel.*;
 import model.GameData;
 import server.ServerFacade;
+import ui.websocket.ServerMessageObserver;
+import websocket.messages.ServerMessage;
 
 import java.awt.*;
 import java.io.PrintStream;
@@ -17,7 +19,7 @@ import static chess.ChessGame.TeamColor.WHITE;
 import static ui.ChessBoard.ColorPerspective.*;
 import static ui.EscapeSequences.*;
 
-public class Client {
+public class Client implements ServerMessageObserver {
 
     private final ServerFacade server;
     private final String serverUrl;
@@ -348,4 +350,14 @@ public class Client {
         ChessBoard uiBoard = new ChessBoard(out, chessClassBoard, perspective, highlights);
         uiBoard.drawBoard();
     }
+
+    @Override
+    public void notify(ServerMessage message) {
+        switch (message.getServerMessageType()) {
+            case NOTIFICATION -> displayNotification(((ServerMessage) message).getMessage());
+            case ERROR -> displayError(((ErrorMessage) message).getErrorMessage());
+            case LOAD_GAME -> loadGame(((LoadGameMessage) message).getGame());
+        }
+    }
+
 }
