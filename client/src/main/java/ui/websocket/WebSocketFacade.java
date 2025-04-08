@@ -2,30 +2,27 @@ package ui.websocket;
 
 import com.google.gson.Gson;
 import exception.ResponseException;
+import websocket.messages.ErrorMessage;
 import websocket.messages.ServerMessage;
 
 import javax.websocket.*;
-import javax.websocket.ContainerProvider;
-import javax.websocket.WebSocketContainer;
-import javax.websocket.Endpoint;
-import javax.websocket.MessageHandler;
-import javax.websocket.Session;
-import javax.websocket.EndpointConfig;
-
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
 
+import static websocket.messages.ServerMessage.ServerMessageType.ERROR;
+
 public class WebSocketFacade extends Endpoint{
 
     Session session;
-    ServerMessageObserver serverMessageObserver;
+    ServerMessageObserver observer;
+    Gson gson = new Gson();
 
-    public WebSocketFacade(String url, ServerMessageObserver serverMessageObserver) throws ResponseException {
+    public WebSocketFacade(String url, ServerMessageObserver observer) throws ResponseException {
         try {
             url = url.replace("http", "ws");
             URI socketURI = new URI(url + "/ws");
-            this.serverMessageObserver = serverMessageObserver;
+            this.observer = observer;
 
             WebSocketContainer container = ContainerProvider.getWebSocketContainer();
             this.session = container.connectToServer(this, socketURI);
@@ -35,16 +32,16 @@ public class WebSocketFacade extends Endpoint{
                 @Override
                 public void onMessage(String message) {
                     try {
-                        ServerMessage message =
+                        ServerMessage serverMessage =
                                 gson.fromJson(message, ServerMessage.class);
-                        observer.notify(message);
+                        observer.notify(serverMessage);
                     } catch(Exception ex) {
-                        observer.notify(new ErrorMessage(ex.getMessage()));
+                        observer.notify(new ErrorMessage(ERROR, ex.getMessage()));
                     }
                 }
             });
         } catch (DeploymentException | IOException | URISyntaxException ex) {
-            throw new ResponseException(500, ex.getMessage());
+            throw new ResponseException(ex.getMessage());
         }
     }
 

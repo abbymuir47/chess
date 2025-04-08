@@ -1,21 +1,17 @@
 package ui;
 
-import chess.ChessGame;
-import chess.ChessMove;
-import chess.ChessPosition;
+import chess.*;
 import exception.ResponseException;
 import handlermodel.*;
 import model.GameData;
 import server.ServerFacade;
 import ui.websocket.ServerMessageObserver;
-import websocket.messages.ServerMessage;
+import websocket.messages.*;
 
-import java.awt.*;
 import java.io.PrintStream;
 import java.nio.charset.StandardCharsets;
 import java.util.*;
 
-import static chess.ChessGame.TeamColor.WHITE;
 import static ui.ChessBoard.ColorPerspective.*;
 import static ui.EscapeSequences.*;
 
@@ -354,10 +350,14 @@ public class Client implements ServerMessageObserver {
     @Override
     public void notify(ServerMessage message) {
         switch (message.getServerMessageType()) {
-            case NOTIFICATION -> displayNotification(((ServerMessage) message).getMessage());
+            case NOTIFICATION -> displayNotification(((NotificationMessage) message).getMessage());
             case ERROR -> displayError(((ErrorMessage) message).getErrorMessage());
             case LOAD_GAME -> loadGame(((LoadGameMessage) message).getGame());
         }
     }
+
+    private void displayNotification(String message){}
+    private void displayError(String errorMessage){}
+    private void loadGame(ChessGame game){}
 
 }
