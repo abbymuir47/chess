@@ -1,16 +1,18 @@
 package server.websocket;
 
 import com.google.gson.Gson;
+import dataaccess.SqlAuthDataAccess;
 import exception.ResponseException;
 import model.AuthData;
+import org.eclipse.jetty.websocket.api.*;
 import org.eclipse.jetty.websocket.api.annotations.OnWebSocketMessage;
-import org.eclipse.jetty.websocket.api.Session;
 import websocket.commands.UserGameCommand;
 
 public class WebSocketHandler {
 
     private final ConnectionManager connections = new ConnectionManager();
     private Gson gson = new Gson();
+    public SqlAuthDataAccess sqlAuthDataAccess;
 
     @OnWebSocketMessage
     public void onMessage(Session session, String message) {
@@ -18,8 +20,11 @@ public class WebSocketHandler {
             UserGameCommand command = gson.fromJson(message, UserGameCommand.class);
 
             String authToken = command.getAuthToken();
+            AuthData auth = sqlAuthDataAccess.getAuth(authToken);
+            String username = auth.username();
+            int gameID = command.getGameID();
 
-            saveSession(command.getGameID(), session);
+            connections.add(username, session);
 
             switch (command.getCommandType()) {
                 case CONNECT -> connect(session, username, command);
