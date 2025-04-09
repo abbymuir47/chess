@@ -2,6 +2,7 @@ package server.websocket;
 
 import com.google.gson.Gson;
 import org.eclipse.jetty.websocket.api.Session;
+import websocket.messages.ErrorMessage;
 import websocket.messages.ServerMessage;
 
 import java.io.IOException;
@@ -9,7 +10,9 @@ import java.util.ArrayList;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
-    public class ConnectionManager {
+import static websocket.messages.ServerMessage.ServerMessageType.ERROR;
+
+public class ConnectionManager {
 
         private final Map<Integer, Map<String,Session>> connections = new ConcurrentHashMap<>();
         private final Gson gson = new Gson();
@@ -34,18 +37,10 @@ import java.util.concurrent.ConcurrentHashMap;
             connections.remove(gameID);
         }
 
-        public void removeGame(int gameID){
-            connections.remove(gameID);
-        }
-
         public void sendMessage(Session session, ServerMessage message) throws IOException {
             if(session.isOpen()){
                 session.getRemote().sendString(gson.toJson(message));
             }
-        }
-
-        public void broadcast(int gameID, ServerMessage message) throws IOException {
-            broadcast(gameID, null, message);
         }
 
         public void broadcast(int gameID, String excludeUsername, ServerMessage message) throws IOException {
@@ -60,12 +55,7 @@ import java.util.concurrent.ConcurrentHashMap;
                     System.out.println("user:" + user);
                     if(!user.equals(excludeUsername)){
                         Session currSession = gameConnections.get(user);
-
-                        if(currSession.isOpen()){
-                            Connection currConnection = new Connection(user, currSession);
-                            System.out.println("currSession open:" + currSession);
-                            currConnection.send(message.toString());
-                        }
+                        sendMessage(currSession, message);
                     }
                 }
             }

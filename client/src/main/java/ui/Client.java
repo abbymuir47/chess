@@ -20,7 +20,6 @@ public class Client implements ServerMessageObserver {
 
     private final ServerFacade server;
     private WebSocketFacade websocket;
-    private final ServerMessageObserver observer;
     private final String serverUrl;
     private State state = State.LOGGEDOUT;
     private Map<Integer, GameData> gameMap = new HashMap<>();
@@ -29,13 +28,9 @@ public class Client implements ServerMessageObserver {
     private ChessBoard.ColorPerspective defaultPerspective = WHITE_PLAYER;
     private ChessBoard.ColorPerspective currPerspective;
 
-    public Client(String serverUrl) {
-        this(serverUrl, (ServerMessageObserver) this);
-    }
 
-    public Client(String serverUrl, ServerMessageObserver observer) {
+    public Client(String serverUrl) {
         this.serverUrl = serverUrl;
-        this.observer = observer;
         this.out = new PrintStream(System.out, true, StandardCharsets.UTF_8);
         server = new ServerFacade(serverUrl);
     }
@@ -101,7 +96,6 @@ public class Client implements ServerMessageObserver {
             LoginRequest req = new LoginRequest(params[0], params[1]);
             LoginResult res = server.login(req);
             state = State.LOGGEDIN;
-            websocket = new WebSocketFacade(serverUrl, observer);
             return ("You logged in as " + res.username() + ". Type help to see more actions.\n");
         }
         throw new ResponseException("Expected: <username> <password>");
@@ -184,6 +178,7 @@ public class Client implements ServerMessageObserver {
                     server.joinGame(req);
                     drawCurrentBoard(id, currPerspective, null);
                     state = State.INGAME;
+                    websocket = new WebSocketFacade(serverUrl, this);
                     return ("Game " + id + " joined.");
                 }
                 throw new ResponseException("Game not found. Please list games and try again.");
