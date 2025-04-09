@@ -124,15 +124,7 @@ public class ChessBoard {
     }
 
     private static void drawWhiteSquare(PrintStream out, int boardRow, int boardCol) {
-        boolean highlighted = false;
-        if (highlights != null) {
-            for (int i = 0; i < highlights.length; i++) {
-                if (highlights[i][0] == boardRow && highlights[i][1] == boardCol) {
-                    highlighted = true;
-                    break;
-                }
-            }
-        }
+        boolean highlighted = isHighlighted(boardRow, boardCol);
         if (highlighted) {
             out.print(SET_BG_COLOR_MAGENTA);
         } else {
@@ -142,9 +134,8 @@ public class ChessBoard {
         drawPieces(out, boardRow, boardCol);
     }
 
-    private static void drawBlackSquare(PrintStream out, int boardRow, int boardCol) {
+    private static boolean isHighlighted(int boardRow, int boardCol) {
         boolean highlighted = false;
-
         if (highlights != null) {
             for (int i = 0; i < highlights.length; i++) {
                 if (highlights[i][0] == boardRow && highlights[i][1] == boardCol) {
@@ -153,6 +144,11 @@ public class ChessBoard {
                 }
             }
         }
+        return highlighted;
+    }
+
+    private static void drawBlackSquare(PrintStream out, int boardRow, int boardCol) {
+        boolean highlighted = isHighlighted(boardRow, boardCol);
         if (highlighted) {
             out.print(SET_BG_COLOR_RED);
         } else {
