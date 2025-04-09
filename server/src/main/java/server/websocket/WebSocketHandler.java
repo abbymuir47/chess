@@ -1,19 +1,15 @@
 package server.websocket;
 
-import chess.ChessGame;
+import chess.*;
 import com.google.gson.Gson;
 import dataaccess.*;
 import exception.ResponseException;
-import model.AuthData;
-import model.GameData;
+import model.*;
 import org.eclipse.jetty.websocket.api.*;
 import org.eclipse.jetty.websocket.api.annotations.OnWebSocketMessage;
 import org.eclipse.jetty.websocket.api.annotations.WebSocket;
-import websocket.commands.UserGameCommand;
-import websocket.messages.ErrorMessage;
-import websocket.messages.LoadGameMessage;
-import websocket.messages.NotificationMessage;
-import websocket.messages.ServerMessage;
+import websocket.commands.*;
+import websocket.messages.*;
 
 import java.io.IOException;
 import java.sql.SQLException;
@@ -49,10 +45,19 @@ public class WebSocketHandler {
         connections.add(gameID, username, session);
 
         switch (command.getCommandType()) {
-            case CONNECT -> connect(session, username, command);
-            case MAKE_MOVE -> makeMove(session, username, command);
-            case LEAVE -> leaveGame(session, username, command);
-            case RESIGN -> resign(session, username, command);
+            case CONNECT:
+                connect(session, username, command);
+                break;
+            case MAKE_MOVE:
+                MakeMoveCommand moveCommand = gson.fromJson(message, MakeMoveCommand.class);
+                makeMove(session, username, moveCommand);
+                break;
+            case LEAVE:
+                leaveGame(session, username, command);
+                break;
+            case RESIGN:
+                resign(session, username, command);
+                break;
         }
     }
 
@@ -75,8 +80,8 @@ public class WebSocketHandler {
         connections.sendMessage(session, gameMessage);
     }
 
-    private void makeMove(Session session, String username, UserGameCommand command){
-
+    private void makeMove(Session session, String username, MakeMoveCommand moveCommand){
+        ChessMove move = moveCommand.getChessMove();
     }
     private void leaveGame(Session session, String username, UserGameCommand command){
 
