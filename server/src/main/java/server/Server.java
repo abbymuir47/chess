@@ -7,6 +7,7 @@ import dataaccess.*;
 import exception.ExceptionMessage;
 import handlermodel.*;
 import model.AuthData;
+import server.websocket.WebSocketHandler;
 import service.*;
 import spark.*;
 
@@ -23,6 +24,8 @@ public class Server {
     private final GameDAO gameDataAccess;
     DatabaseManager manager = new DatabaseManager();
 
+    private final WebSocketHandler webSocketHandler;
+
     public Server(){
         this.userDataAccess = new SqlUserDataAccess();
         this.authDataAccess = new SqlAuthDataAccess();
@@ -30,6 +33,8 @@ public class Server {
         this.userService = new UserService(userDataAccess,authDataAccess);
         this.authService = new AuthService(userDataAccess,authDataAccess);
         this.gameService = new GameService(userDataAccess,authDataAccess,gameDataAccess);
+
+        webSocketHandler = new WebSocketHandler();
         try {
             manager.configureDatabase();
         } catch (DataAccessException e) {
@@ -42,7 +47,7 @@ public class Server {
 
         Spark.staticFiles.location("web");
 
-        // Register your endpoints and handle exceptions here.
+        Spark.webSocket("/ws", webSocketHandler);
 
         Spark.post("/user", this::register);
         Spark.post("/session", this::login);
@@ -144,10 +149,5 @@ public class Server {
         AuthData auth = authDataAccess.getAuth(authToken);
         return auth.username();
     }
-
-
-
-    // Spark.exception - would be wise to create multiple exceptions
-    // Spark.awaitInitialization()
 
 }

@@ -3,6 +3,7 @@ package server.websocket;
 import org.eclipse.jetty.websocket.api.Session;
 
 import java.io.IOException;
+import java.util.concurrent.ConcurrentHashMap;
 
 public class Connection {
     public String userName;

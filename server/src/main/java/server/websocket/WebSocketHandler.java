@@ -6,17 +6,23 @@ import exception.ResponseException;
 import model.AuthData;
 import org.eclipse.jetty.websocket.api.*;
 import org.eclipse.jetty.websocket.api.annotations.OnWebSocketMessage;
+import org.eclipse.jetty.websocket.api.annotations.WebSocket;
 import websocket.commands.UserGameCommand;
 import websocket.messages.ErrorMessage;
+import websocket.messages.NotificationMessage;
 import websocket.messages.ServerMessage;
 
 import java.io.IOException;
 
+import static websocket.messages.ServerMessage.ServerMessageType.ERROR;
+import static websocket.messages.ServerMessage.ServerMessageType.NOTIFICATION;
+
+@WebSocket
 public class WebSocketHandler {
 
     private final ConnectionManager connections = new ConnectionManager();
     private Gson gson = new Gson();
-    public SqlAuthDataAccess sqlAuthDataAccess;
+    public SqlAuthDataAccess sqlAuthDataAccess = new SqlAuthDataAccess();
 
     @OnWebSocketMessage
     public void onMessage(Session session, String message) throws IOException {
@@ -24,7 +30,19 @@ public class WebSocketHandler {
             UserGameCommand command = gson.fromJson(message, UserGameCommand.class);
 
             String authToken = command.getAuthToken();
+
+            if(authToken == null | authToken.isEmpty()){
+                connections.sendMessage(session, new ErrorMessage(ERROR, "Error: enter authentication"));
+                return;
+            }
+
             AuthData auth = sqlAuthDataAccess.getAuth(authToken);
+
+            if(auth == null){
+                connections.sendMessage(session, new ErrorMessage(ERROR, "Error: unauthorized"));
+                return;
+            }
+
             String username = auth.username();
             int gameID = command.getGameID();
 
@@ -37,11 +55,16 @@ public class WebSocketHandler {
                 case RESIGN -> resign(session, username, command);
             }
         } catch (Exception ex) {
-            connections.sendMessage(session, new ErrorMessage(ServerMessage.ServerMessageType.ERROR, "Error: " + ex.getMessage()));
+            connections.sendMessage(session, new ErrorMessage(ERROR, "Error: " + ex.getMessage()));
         }
     }
 
-    private void connect(Session session, String username, UserGameCommand command){}
+    private void connect(Session session, String username, UserGameCommand command){
+        System.out.println("connect request made");
+        connections.add(command.getGameID(), username, session);
+        NotificationMessage connectMessage = new NotificationMessage(NOTIFICATION, String.format("%s joined the game", username));
+        connections.broadcast(username, connectMessage);
+    }
     private void makeMove(Session session, String username, UserGameCommand command){}
     private void leaveGame(Session session, String username, UserGameCommand command){}
     private void resign(Session session, String username, UserGameCommand command){}
