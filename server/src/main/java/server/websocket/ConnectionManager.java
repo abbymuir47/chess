@@ -44,4 +44,31 @@ import java.util.concurrent.ConcurrentHashMap;
             }
         }
 
+        public void broadcast(int gameID, ServerMessage message) throws IOException {
+            broadcast(gameID, null, message);
+        }
+
+        public void broadcast(int gameID, String excludeUsername, ServerMessage message) throws IOException {
+            System.out.println("in broadcast");
+            if(!connections.containsKey(gameID)){
+                return;
+            }
+            else{
+                System.out.println("gameID connection found");
+                var gameConnections = connections.get(gameID);
+                for(var user: gameConnections.keySet()){
+                    System.out.println("user:" + user);
+                    if(!user.equals(excludeUsername)){
+                        Session currSession = gameConnections.get(user);
+
+                        if(currSession.isOpen()){
+                            Connection currConnection = new Connection(user, currSession);
+                            System.out.println("currSession open:" + currSession);
+                            currConnection.send(message.toString());
+                        }
+                    }
+                }
+            }
+        }
+
     }

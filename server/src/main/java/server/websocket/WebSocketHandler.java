@@ -59,11 +59,13 @@ public class WebSocketHandler {
         }
     }
 
-    private void connect(Session session, String username, UserGameCommand command){
+    private void connect(Session session, String username, UserGameCommand command) throws IOException {
         System.out.println("connect request made");
         connections.add(command.getGameID(), username, session);
         NotificationMessage connectMessage = new NotificationMessage(NOTIFICATION, String.format("%s joined the game", username));
-        connections.broadcast(username, connectMessage);
+        System.out.println("connect message: " + connectMessage);
+        connections.broadcast(command.getGameID(), username, connectMessage);
+        System.out.println("broadcast completed");
     }
     private void makeMove(Session session, String username, UserGameCommand command){}
     private void leaveGame(Session session, String username, UserGameCommand command){}
