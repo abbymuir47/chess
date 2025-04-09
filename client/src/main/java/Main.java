@@ -1,5 +1,6 @@
 import chess.*;
 import ui.Client;
+import ui.websocket.ServerMessageObserver;
 
 public class Main {
     public static void main(String[] args) {
@@ -7,6 +8,7 @@ public class Main {
         System.out.println("♕ 240 Chess Client: " + piece);
 
         var serverUrl = "http://localhost:8080";
+
         if (args.length == 1) {
             serverUrl = args[0];
         }

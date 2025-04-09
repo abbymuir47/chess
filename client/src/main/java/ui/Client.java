@@ -6,6 +6,7 @@ import handlermodel.*;
 import model.GameData;
 import server.ServerFacade;
 import ui.websocket.ServerMessageObserver;
+import ui.websocket.WebSocketFacade;
 import websocket.messages.*;
 
 import java.io.PrintStream;
@@ -18,6 +19,8 @@ import static ui.EscapeSequences.*;
 public class Client implements ServerMessageObserver {
 
     private final ServerFacade server;
+    private WebSocketFacade websocket;
+    private final ServerMessageObserver observer;
     private final String serverUrl;
     private State state = State.LOGGEDOUT;
     private Map<Integer, GameData> gameMap = new HashMap<>();
@@ -27,9 +30,14 @@ public class Client implements ServerMessageObserver {
     private ChessBoard.ColorPerspective currPerspective;
 
     public Client(String serverUrl) {
-        server = new ServerFacade(serverUrl);
+        this(serverUrl, (ServerMessageObserver) this);
+    }
+
+    public Client(String serverUrl, ServerMessageObserver observer) {
         this.serverUrl = serverUrl;
+        this.observer = observer;
         this.out = new PrintStream(System.out, true, StandardCharsets.UTF_8);
+        server = new ServerFacade(serverUrl);
     }
 
     public void run() {
@@ -93,6 +101,7 @@ public class Client implements ServerMessageObserver {
             LoginRequest req = new LoginRequest(params[0], params[1]);
             LoginResult res = server.login(req);
             state = State.LOGGEDIN;
+            websocket = new WebSocketFacade(serverUrl, observer);
             return ("You logged in as " + res.username() + ". Type help to see more actions.\n");
         }
         throw new ResponseException("Expected: <username> <password>");
@@ -356,8 +365,15 @@ public class Client implements ServerMessageObserver {
         }
     }
 
-    private void displayNotification(String message){}
-    private void displayError(String errorMessage){}
-    private void loadGame(ChessGame game){}
+    private void displayNotification(String message){
+        System.out.println("client-side, notification message received");
+    }
+    private void displayError(String errorMessage){
+        System.out.println("client-side, error message received");
+    }
+    private void loadGame(ChessGame game){
+        //call get and draw board with the passed in game
+        System.out.println("client-side, load game message received");
+    }
 
 }

@@ -67,6 +67,7 @@ public class WebSocketHandler {
         connections.broadcast(command.getGameID(), username, connectMessage);
         System.out.println("broadcast completed");
     }
+
     private void makeMove(Session session, String username, UserGameCommand command){}
     private void leaveGame(Session session, String username, UserGameCommand command){}
     private void resign(Session session, String username, UserGameCommand command){}

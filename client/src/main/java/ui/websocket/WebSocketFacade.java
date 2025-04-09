@@ -48,19 +48,6 @@ public class WebSocketFacade extends Endpoint{
     //Endpoint requires this method, but you don't have to do anything
     @Override
     public void onOpen(Session session, EndpointConfig endpointConfig) {
+        System.out.println("client-side, websocket connection opened");
     }
-
-    /*
-    public void onMessage(String message) {
-  try {
-    ServerMessage message =
-        gson.fromJson(message, ServerMessage.class);
-    observer.notify(message);
-  } catch(Exception ex) {
-    observer.notify(new ErrorMessage(ex.getMessage()));
-  }
-}
-
-     */
-
 }
