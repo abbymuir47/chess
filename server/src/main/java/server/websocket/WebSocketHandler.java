@@ -101,6 +101,7 @@ public class WebSocketHandler {
 
         ChessBoard board = game.getBoard();
         ChessGame.TeamColor currTurnColor = game.getTeamTurn();
+        ChessGame.TeamColor otherTeamColor = null;
         ChessPosition startPos = move.getStartPosition();
         ChessPosition endPos = move.getEndPosition();
         String playerType = "";
@@ -112,8 +113,14 @@ public class WebSocketHandler {
 
             if(startPiece.getTeamColor()== currTurnColor){
                 System.out.println("player is correctly requesting to move its own piece");
-                if(currTurnColor==WHITE){playerType="white";}
-                if(currTurnColor==BLACK){playerType="white";}
+                if(currTurnColor==WHITE){
+                    playerType="white";
+                    otherTeamColor = BLACK;
+                }
+                if(currTurnColor==BLACK){
+                    playerType="black";
+                    otherTeamColor=WHITE;
+                }
             }
             else{
                 connections.sendMessage(session, new ErrorMessage(ERROR, "Error: player cannot move a piece that's not its own"));
@@ -157,21 +164,21 @@ public class WebSocketHandler {
         connections.broadcast(gameID, username, moveNotification);
 
         //send notification message to all if the move results in check, checkmate, or stalemate
-        if(game.isInCheck(currTurnColor)){
-            String checkMessage = currTurnColor + " player " + username + " is in check";
+        if(game.isInCheck(otherTeamColor)){
+            String checkMessage = otherTeamColor + " player " + username + " is in check";
             NotificationMessage checkNotification = new NotificationMessage(NOTIFICATION, checkMessage);
             connections.broadcast(gameID, "", checkNotification);
         }
 
-        if(game.isInCheckmate(currTurnColor)){
-            String checkmateMessage = currTurnColor + " player " + username + " is in checkmate";
+        if(game.isInCheckmate(otherTeamColor)){
+            String checkmateMessage = otherTeamColor + " player " + username + " is in checkmate. Game over.";
             NotificationMessage checkmateNotification = new NotificationMessage(NOTIFICATION, checkmateMessage);
             connections.broadcast(gameID, "", checkmateNotification);
             game.setGameOver(true);
         }
 
-        if(game.isInStalemate(currTurnColor)){
-            String stalemateMessage = currTurnColor + " player " + username + " is in stalemate";
+        if(game.isInStalemate(otherTeamColor)){
+            String stalemateMessage = otherTeamColor + " player " + username + " is in stalemate. Game over.";
             NotificationMessage stalemateNotification = new NotificationMessage(NOTIFICATION, stalemateMessage);
             connections.broadcast(gameID, "", stalemateNotification);
             game.setGameOver(true);

@@ -116,7 +116,7 @@ public class Client implements ServerMessageObserver {
             ListResult list = server.listGames();
             int id = gameMap.size() +1;
             gameMap.put(id, list.games().getLast());
-            return ("Your new game ID is: " + id);
+            return ("Game created");
         }
         throw new ResponseException("Expected: <game name>");
     }
@@ -150,11 +150,13 @@ public class Client implements ServerMessageObserver {
             ArrayList<GameData> games = res.games();
             try{
                 int id = Integer.parseInt(params[0]);
+                currGame = gameMap.get(id);
                 websocket = new WebSocketFacade(serverUrl, this);
                 websocket.observeGame(currAuth, id);
                 //drawCurrentBoard(id, defaultPerspective, null);
                 state = State.INGAME;
                 currGameID = id;
+                currPerspective = WHITE_PLAYER;
                 return ("You are observing game " + id);
             } catch (NumberFormatException e) {
                 throw new ResponseException("Please input an integer as gameID");
@@ -220,6 +222,9 @@ public class Client implements ServerMessageObserver {
     private String makeMove(String[] params) throws ResponseException {
         if(params.length == 1 || params.length == 3){
             String req = params[0];
+            if(req.length()!=4){
+                return "expected move in the format c1c2";
+            }
             int startRow = getRow(req.substring(0,2));
             int startCol = getCol(req.substring(0,2));
             ChessPosition startPos = new ChessPosition(startRow, startCol);
@@ -267,6 +272,12 @@ public class Client implements ServerMessageObserver {
                 ChessPosition potentialMove = move.getEndPosition();
                 positions[i][0] = potentialMove.getRow();
                 positions[i][1] = potentialMove.getColumn();
+
+                if (currPerspective == BLACK_PLAYER) {
+                    row = 9 - row;  // flip row: 1↔8, 2↔7, etc.
+                    col = 9 - col;  // flip column: a↔h, b↔g, etc.
+                }
+
                 i++;
             }
             drawCurrentBoard(currGame.gameID(), currPerspective, positions);
@@ -409,14 +420,9 @@ public class Client implements ServerMessageObserver {
     }
     private void loadGame(String message){
         LoadGameMessage loadGameMessage = gson.fromJson(message, LoadGameMessage.class);
-
-        if(loadGameMessage.getPlayerType().equals("white")){currPerspective = WHITE_PLAYER;}
-        else if(loadGameMessage.getPlayerType().equals("black")){currPerspective = BLACK_PLAYER;}
-        else{currPerspective = WHITE_PLAYER;}
-
-        //i know this doesn't make sense because it's not truly updating it but need to figure out how to do so
         currGame = new GameData(currGameID, currGame.whiteUsername(), currGame.blackUsername(), currGame.gameName(), loadGameMessage.getGame());
         drawChessGame(currPerspective, null, loadGameMessage.getGame());
+        System.out.println();
     }
 
 }
