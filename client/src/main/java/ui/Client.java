@@ -320,8 +320,23 @@ public class Client implements ServerMessageObserver {
     }
 
     private String resign(String[] params) throws ResponseException {
-        websocket.resign(currAuth, currGameID);
-        return "you have now resigned, the game is over";
+
+        out.print(SET_TEXT_COLOR_RED);
+        out.println("Are you sure you want to resign? This action is irreversible: Y/N:");
+
+        Scanner scanner = new Scanner(System.in);
+        String line = scanner.nextLine();
+
+        if(line.equals("Y")){
+            websocket.resign(currAuth, currGameID);
+            return "You have now resigned, the game is over.";
+        }
+        else if(line.equals("N")){
+            return "Resignation cancelled, the game is still going.";
+        }
+        else{
+            return "Please enter Y for yes or N for no";
+        }
     }
 
     private String leaveGame(String[] params) throws ResponseException {
