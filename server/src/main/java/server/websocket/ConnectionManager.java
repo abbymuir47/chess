@@ -45,6 +45,7 @@ public class ConnectionManager {
 
         public void broadcast(int gameID, String excludeUsername, ServerMessage message) throws IOException {
             System.out.println("in broadcast");
+
             if(!connections.containsKey(gameID)){
                 return;
             }
@@ -59,6 +60,8 @@ public class ConnectionManager {
                     }
                 }
             }
+
+
         }
 
     }
