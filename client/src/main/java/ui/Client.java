@@ -1,6 +1,7 @@
 package ui;
 
 import chess.*;
+import com.google.gson.Gson;
 import exception.ResponseException;
 import handlermodel.*;
 import model.GameData;
@@ -27,6 +28,8 @@ public class Client implements ServerMessageObserver {
     private static PrintStream out;
     private ChessBoard.ColorPerspective defaultPerspective = WHITE_PLAYER;
     private ChessBoard.ColorPerspective currPerspective;
+    private String currAuth;
+    public Gson gson = new Gson();
 
 
     public Client(String serverUrl) {
@@ -56,7 +59,7 @@ public class Client implements ServerMessageObserver {
     }
 
     private void printPrompt() {
-        System.out.print("\n" + state + " >>> " + SET_TEXT_COLOR_GREEN);
+        System.out.print("\n" + state + " >>> " + SET_TEXT_COLOR_GREEN + "\n");
     }
 
     public String eval(String input) throws ResponseException {
@@ -85,6 +88,7 @@ public class Client implements ServerMessageObserver {
         if(params.length == 3) {
             RegisterRequest req = new RegisterRequest(params[0], params[1], params[2]);
             RegisterResult res = server.register(req);
+            currAuth = res.authToken();
             state = State.LOGGEDIN;
             return ("You registered as " + res.username());
         }
@@ -95,6 +99,7 @@ public class Client implements ServerMessageObserver {
         if(params.length == 2) {
             LoginRequest req = new LoginRequest(params[0], params[1]);
             LoginResult res = server.login(req);
+            currAuth = res.authToken();
             state = State.LOGGEDIN;
             return ("You logged in as " + res.username() + ". Type help to see more actions.\n");
         }
@@ -143,7 +148,9 @@ public class Client implements ServerMessageObserver {
             ArrayList<GameData> games = res.games();
             try{
                 int id = Integer.parseInt(params[0]);
-                drawCurrentBoard(id, defaultPerspective, null);
+                websocket = new WebSocketFacade(serverUrl, this);
+                websocket.observeGame(currAuth, id);
+                //drawCurrentBoard(id, defaultPerspective, null);
                 return ("You are observing game " + id);
             } catch (NumberFormatException e) {
                 throw new ResponseException("Please input an integer as gameID");
@@ -346,29 +353,45 @@ public class Client implements ServerMessageObserver {
 
     private static void getAndDrawBoard(GameData game, ChessBoard.ColorPerspective perspective, int[][] highlights) {
         ChessGame currGame = game.game();
+        drawChessGame(perspective, highlights, currGame);
+    }
+
+    private static void drawChessGame(ChessBoard.ColorPerspective perspective, int[][] highlights, ChessGame currGame) {
         chess.ChessBoard chessClassBoard = currGame.getBoard();
         ChessBoard uiBoard = new ChessBoard(out, chessClassBoard, perspective, highlights);
         uiBoard.drawBoard();
     }
 
     @Override
-    public void notify(ServerMessage message) {
-        switch (message.getServerMessageType()) {
-            case NOTIFICATION -> displayNotification(((NotificationMessage) message).getMessage());
-            case ERROR -> displayError(((ErrorMessage) message).getErrorMessage());
-            case LOAD_GAME -> loadGame(((LoadGameMessage) message).getGame());
+    public void notify(String message) {
+
+        ServerMessage serverMessage =
+                gson.fromJson(message, ServerMessage.class);
+
+        System.out.println("in notify of client, message type: " + serverMessage.getServerMessageType());
+
+        switch (serverMessage.getServerMessageType()) {
+            case NOTIFICATION -> displayNotification(message);
+            case ERROR -> displayError(message);
+            case LOAD_GAME -> loadGame(message);
         }
     }
 
     private void displayNotification(String message){
-        System.out.println("client-side, notification message received");
+        NotificationMessage notificationMessage = gson.fromJson(message, NotificationMessage.class);
+        System.out.println("client-side, notification: " + notificationMessage.getMessage());
     }
-    private void displayError(String errorMessage){
-        System.out.println("client-side, error message received");
+    private void displayError(String message){
+        ErrorMessage errorMessage = gson.fromJson(message, ErrorMessage.class);
+        System.out.println("client-side, error: " + errorMessage.getErrorMessage());
     }
-    private void loadGame(ChessGame game){
+    private void loadGame(String message){
         //call get and draw board with the passed in game
+        // will need to modify this so the perspective changes
         System.out.println("client-side, load game message received");
+        LoadGameMessage loadGameMessage = gson.fromJson(message, LoadGameMessage.class);
+        drawChessGame(defaultPerspective, null, loadGameMessage.getGame());
+        System.out.println("still in notify, board was drawn");
     }
 
 }

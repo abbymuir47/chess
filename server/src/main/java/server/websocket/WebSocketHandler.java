@@ -56,6 +56,7 @@ public class WebSocketHandler {
     }
 
     private void connect(Session session, String username, UserGameCommand command) throws IOException, DataAccessException {
+        System.out.println("connect command received from client");
         int gameID = command.getGameID();
         GameData gameData = getValidGameData(session, gameID);
         if (gameData == null) {return;}
@@ -80,6 +81,7 @@ public class WebSocketHandler {
         //send load game message back to the user
         LoadGameMessage gameMessage = new LoadGameMessage(LOAD_GAME, game);
         connections.sendMessage(session, gameMessage);
+        System.out.println("just sent message");
     }
 
     private void makeMove(Session session, String username, String message) throws IOException, DataAccessException, InvalidMoveException {

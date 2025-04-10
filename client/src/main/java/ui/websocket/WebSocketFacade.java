@@ -2,6 +2,7 @@ package ui.websocket;
 
 import com.google.gson.Gson;
 import exception.ResponseException;
+import websocket.commands.UserGameCommand;
 import websocket.messages.ErrorMessage;
 import websocket.messages.ServerMessage;
 
@@ -10,6 +11,7 @@ import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
 
+import static websocket.commands.UserGameCommand.CommandType.CONNECT;
 import static websocket.messages.ServerMessage.ServerMessageType.ERROR;
 
 public class WebSocketFacade extends Endpoint{
@@ -31,13 +33,16 @@ public class WebSocketFacade extends Endpoint{
             this.session.addMessageHandler(new MessageHandler.Whole<String>() {
                 @Override
                 public void onMessage(String message) {
+                    System.out.println("client-side, about to call notify from onMessage");
+                    observer.notify(message);
+                    /*
                     try {
-                        ServerMessage serverMessage =
-                                gson.fromJson(message, ServerMessage.class);
-                        observer.notify(serverMessage);
+                        observer.notify(message);
                     } catch(Exception ex) {
                         observer.notify(new ErrorMessage(ERROR, ex.getMessage()));
                     }
+
+                     */
                 }
             });
         } catch (DeploymentException | IOException | URISyntaxException ex) {
@@ -49,5 +54,16 @@ public class WebSocketFacade extends Endpoint{
     @Override
     public void onOpen(Session session, EndpointConfig endpointConfig) {
         System.out.println("client-side, websocket connection opened");
+    }
+
+    public void observeGame(String authToken, int gameID) throws ResponseException {
+        System.out.println("client-side, observe game request made");
+
+        try {
+            UserGameCommand observeCommand = new UserGameCommand(CONNECT, authToken, gameID);
+            this.session.getBasicRemote().sendText(new Gson().toJson(observeCommand));
+        } catch (IOException ex) {
+            throw new ResponseException(ex.getMessage());
+        }
     }
 }
