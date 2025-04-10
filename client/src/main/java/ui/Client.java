@@ -30,6 +30,7 @@ public class Client implements ServerMessageObserver {
     private ChessBoard.ColorPerspective currPerspective;
     private String currAuth;
     public Gson gson = new Gson();
+    private int currGameID;
 
 
     public Client(String serverUrl) {
@@ -151,6 +152,8 @@ public class Client implements ServerMessageObserver {
                 websocket = new WebSocketFacade(serverUrl, this);
                 websocket.observeGame(currAuth, id);
                 //drawCurrentBoard(id, defaultPerspective, null);
+                state = State.INGAME;
+                currGameID = id;
                 return ("You are observing game " + id);
             } catch (NumberFormatException e) {
                 throw new ResponseException("Please input an integer as gameID");
@@ -186,6 +189,7 @@ public class Client implements ServerMessageObserver {
                     drawCurrentBoard(id, currPerspective, null);
                     state = State.INGAME;
                     websocket = new WebSocketFacade(serverUrl, this);
+                    currGameID = id;
                     return ("Game " + id + " joined.");
                 }
                 throw new ResponseException("Game not found. Please list games and try again.");
@@ -295,7 +299,16 @@ public class Client implements ServerMessageObserver {
     }
 
     private String leaveGame(String[] params) throws ResponseException {
-        websocket.leaveGame
+        assertSignedIn();
+        if(params.length == 0) {
+            websocket.leaveGame(currAuth, currGameID);
+            state = State.LOGGEDIN;
+        }
+        throw new ResponseException("Expected: leave");
+//        else {
+//            return "game left";
+//        }
+//        return "";
     }
 
     public String help() {
@@ -379,11 +392,13 @@ public class Client implements ServerMessageObserver {
 
     private void displayNotification(String message){
         NotificationMessage notificationMessage = gson.fromJson(message, NotificationMessage.class);
-        System.out.println("client-side, notification: " + notificationMessage.getMessage());
+        System.out.println("client-side, notification received: " + notificationMessage.getMessage());
     }
     private void displayError(String message){
         ErrorMessage errorMessage = gson.fromJson(message, ErrorMessage.class);
         System.out.println("client-side, error: " + errorMessage.getErrorMessage());
+        out.print(SET_TEXT_COLOR_RED);
+        out.println(errorMessage.getErrorMessage());
     }
     private void loadGame(String message){
         //call get and draw board with the passed in game

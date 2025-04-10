@@ -12,6 +12,7 @@ import java.net.URI;
 import java.net.URISyntaxException;
 
 import static websocket.commands.UserGameCommand.CommandType.CONNECT;
+import static websocket.commands.UserGameCommand.CommandType.LEAVE;
 import static websocket.messages.ServerMessage.ServerMessageType.ERROR;
 
 public class WebSocketFacade extends Endpoint{
@@ -68,11 +69,13 @@ public class WebSocketFacade extends Endpoint{
     }
 
     public void leaveGame(String authToken, int gameID) throws ResponseException {
-        System.out.println("client-side, observe game request made");
+        System.out.println("client-side, leave game request made");
 
         try {
-            UserGameCommand observeCommand = new UserGameCommand(CONNECT, authToken, gameID);
-            this.session.getBasicRemote().sendText(new Gson().toJson(observeCommand));
+            UserGameCommand leaveCommand = new UserGameCommand(LEAVE, authToken, gameID);
+            System.out.println("client-side, about to send leave command over. gameID: " + gameID);
+            this.session.getBasicRemote().sendText(new Gson().toJson(leaveCommand));
+            System.out.println("leave command sent");
         } catch (IOException ex) {
             throw new ResponseException(ex.getMessage());
         }

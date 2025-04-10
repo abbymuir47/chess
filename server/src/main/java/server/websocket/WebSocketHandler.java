@@ -179,6 +179,7 @@ public class WebSocketHandler {
     }
 
     private void leaveGame(Session session, String username, UserGameCommand command) throws DataAccessException, IOException {
+        System.out.println("server-side, leave command received");
         int gameID = command.getGameID();
         GameData originalGame = getValidGameData(session, gameID);
         if (originalGame == null) {return;}
@@ -194,6 +195,7 @@ public class WebSocketHandler {
             updatedGame = originalGame;
         }
 
+        System.out.println("about to broadcast leavegame message");
         connections.broadcast(gameID, username, leaveMessage);
         sqlGameDataAccess.updateGame(updatedGame);
         connections.remove(gameID, username);
