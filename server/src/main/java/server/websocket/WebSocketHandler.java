@@ -182,10 +182,14 @@ public class WebSocketHandler {
         if (isPlayer(username, gameData)){
             System.out.println("valid resign request received from a player");
             ChessGame chessGame = gameData.game();
+            GameData gameOver;
             if(!chessGame.isGameOver()){
                 chessGame.setGameOver(true);
                 NotificationMessage resignMessage = new NotificationMessage(NOTIFICATION, String.format("%s resigned from the game", username));
                 connections.broadcast(gameID, "", resignMessage);
+
+                gameOver = new GameData(gameID, gameData.whiteUsername(), gameData.blackUsername(), gameData.gameName(), chessGame);
+                sqlGameDataAccess.updateGame(gameOver);
             }
             else{
                 connections.sendMessage(session, new ErrorMessage(ERROR, "Error: cannot resign from game that is already over"));
