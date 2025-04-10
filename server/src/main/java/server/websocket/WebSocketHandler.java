@@ -173,15 +173,23 @@ public class WebSocketHandler {
 
     private void resign(Session session, String username, UserGameCommand command) throws IOException, DataAccessException {
         int gameID = command.getGameID();
-        GameData originalGame = sqlGameDataAccess.getGame(gameID);
-        if (originalGame == null) {
+        GameData gameData = sqlGameDataAccess.getGame(gameID);
+        if (gameData == null) {
             connections.sendMessage(session, new ErrorMessage(ERROR, "Error: enter a valid game ID"));
             return;
         }
 
-        if (isPlayer(username, originalGame)){
+        if (isPlayer(username, gameData)){
             System.out.println("valid resign request received from a player");
-
+            ChessGame chessGame = gameData.game();
+            if(!chessGame.isGameOver()){
+                chessGame.setGameOver(true);
+                NotificationMessage resignMessage = new NotificationMessage(NOTIFICATION, String.format("%s resigned from the game", username));
+                connections.broadcast(gameID, "", resignMessage);
+            }
+            else{
+                connections.sendMessage(session, new ErrorMessage(ERROR, "Error: cannot resign from game that is already over"));
+            }
         }
         else{
             connections.sendMessage(session, new ErrorMessage(ERROR, "Error: observer cannot resign from a game"));

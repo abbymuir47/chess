@@ -1,5 +1,7 @@
 package chess;
 
+import exception.ResponseException;
+
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Objects;
@@ -22,7 +24,7 @@ public class ChessGame {
         board = new ChessBoard();
         board.resetBoard();
         team = TeamColor.WHITE;
-        gamePver
+        gameOver = false;
     }
 
     public ChessGame(ChessGame original) {
@@ -94,6 +96,14 @@ public class ChessGame {
         return validMoves;
     }
 
+    public void setGameOver(boolean gameOver) {
+        this.gameOver = gameOver;
+    }
+
+    public boolean isGameOver() {
+        return gameOver;
+    }
+
     /**
      * Makes a move in a chess game
      *
@@ -104,46 +114,51 @@ public class ChessGame {
      * A move is illegal if it is not a "valid" move for the piece at the starting location,
      * or if it’s not the corresponding team's turn.
      */
-    public void makeMove(ChessMove move) throws InvalidMoveException {
-        ChessPosition startPosition = move.getStartPosition();
-        ChessPosition endPosition = move.getEndPosition();
-        ChessPiece.PieceType promotionPiece = move.getPromotionPiece();
-
-        ChessPiece currPiece = board.getPiece(startPosition);
-        if(currPiece == null){
-            throw new InvalidMoveException("Empty square");
+    public void makeMove(ChessMove move) throws InvalidMoveException{
+        if(gameOver){
+            return;
         }
+        else{
+            ChessPosition startPosition = move.getStartPosition();
+            ChessPosition endPosition = move.getEndPosition();
+            ChessPiece.PieceType promotionPiece = move.getPromotionPiece();
 
-        ChessGame.TeamColor pieceColor = currPiece.getTeamColor();
+            ChessPiece currPiece = board.getPiece(startPosition);
+            if(currPiece == null){
+                throw new InvalidMoveException("Empty square");
+            }
 
-        //makes sure the piece is playing in turn
-        if(pieceColor == team){
-            Collection<ChessMove> validMoves = validMoves(startPosition);
+            ChessGame.TeamColor pieceColor = currPiece.getTeamColor();
 
-            if(validMoves.contains(move)){
-                System.out.println("board before moving piece; \n" + board);
-                if(promotionPiece != null){
-                    currPiece = new ChessPiece(pieceColor, promotionPiece);
-                }
+            //makes sure the piece is playing in turn
+            if(pieceColor == team){
+                Collection<ChessMove> validMoves = validMoves(startPosition);
 
-                board.addPiece(endPosition, currPiece);
-                board.addPiece(startPosition, null);
-                System.out.println("board after moving piece; \n" + board);
+                if(validMoves.contains(move)){
+                    System.out.println("board before moving piece; \n" + board);
+                    if(promotionPiece != null){
+                        currPiece = new ChessPiece(pieceColor, promotionPiece);
+                    }
 
-                //switches team color after the move is made
-                if(team == TeamColor.WHITE){
-                    team = TeamColor.BLACK;
+                    board.addPiece(endPosition, currPiece);
+                    board.addPiece(startPosition, null);
+                    System.out.println("board after moving piece; \n" + board);
+
+                    //switches team color after the move is made
+                    if(team == TeamColor.WHITE){
+                        team = TeamColor.BLACK;
+                    }
+                    else{
+                        team = TeamColor.WHITE;
+                    }
                 }
                 else{
-                    team = TeamColor.WHITE;
+                    throw new InvalidMoveException("This was not a valid move");
                 }
             }
             else{
-                throw new InvalidMoveException("This was not a valid move");
+                throw new InvalidMoveException("It is not your turn");
             }
-        }
-        else{
-            throw new InvalidMoveException("It is not your turn");
         }
     }
 
