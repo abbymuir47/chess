@@ -1,7 +1,9 @@
 package ui.websocket;
 
+import chess.ChessMove;
 import com.google.gson.Gson;
 import exception.ResponseException;
+import websocket.commands.MakeMoveCommand;
 import websocket.commands.UserGameCommand;
 import websocket.messages.ErrorMessage;
 import websocket.messages.ServerMessage;
@@ -11,8 +13,7 @@ import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
 
-import static websocket.commands.UserGameCommand.CommandType.CONNECT;
-import static websocket.commands.UserGameCommand.CommandType.LEAVE;
+import static websocket.commands.UserGameCommand.CommandType.*;
 import static websocket.messages.ServerMessage.ServerMessageType.ERROR;
 
 public class WebSocketFacade extends Endpoint{
@@ -34,7 +35,6 @@ public class WebSocketFacade extends Endpoint{
             this.session.addMessageHandler(new MessageHandler.Whole<String>() {
                 @Override
                 public void onMessage(String message) {
-                    System.out.println("client-side, about to call notify from onMessage");
                     observer.notify(message);
                     /*
                     try {
@@ -54,12 +54,9 @@ public class WebSocketFacade extends Endpoint{
     //Endpoint requires this method, but you don't have to do anything
     @Override
     public void onOpen(Session session, EndpointConfig endpointConfig) {
-        System.out.println("client-side, websocket connection opened");
     }
 
     public void observeGame(String authToken, int gameID) throws ResponseException {
-        System.out.println("client-side, observe game request made");
-
         try {
             UserGameCommand observeCommand = new UserGameCommand(CONNECT, authToken, gameID);
             this.session.getBasicRemote().sendText(new Gson().toJson(observeCommand));
@@ -68,16 +65,42 @@ public class WebSocketFacade extends Endpoint{
         }
     }
 
-    public void leaveGame(String authToken, int gameID) throws ResponseException {
-        System.out.println("client-side, leave game request made");
-
+    public void joinGame(String authToken, int gameID) throws ResponseException {
         try {
-            UserGameCommand leaveCommand = new UserGameCommand(LEAVE, authToken, gameID);
-            System.out.println("client-side, about to send leave command over. gameID: " + gameID);
-            this.session.getBasicRemote().sendText(new Gson().toJson(leaveCommand));
-            System.out.println("leave command sent");
+            UserGameCommand joinCommand = new UserGameCommand(CONNECT, authToken, gameID);
+            this.session.getBasicRemote().sendText(new Gson().toJson(joinCommand));
         } catch (IOException ex) {
             throw new ResponseException(ex.getMessage());
         }
     }
+
+    public void resign(String authToken, int gameID) throws ResponseException {
+        try {
+            UserGameCommand leaveCommand = new UserGameCommand(RESIGN, authToken, gameID);
+            this.session.getBasicRemote().sendText(new Gson().toJson(leaveCommand));
+        } catch (IOException ex) {
+            throw new ResponseException(ex.getMessage());
+        }
+    }
+
+    public void leaveGame(String authToken, int gameID) throws ResponseException {
+        try {
+            UserGameCommand leaveCommand = new UserGameCommand(LEAVE, authToken, gameID);
+            this.session.getBasicRemote().sendText(new Gson().toJson(leaveCommand));
+        } catch (IOException ex) {
+            throw new ResponseException(ex.getMessage());
+        }
+    }
+
+    public void makeMove(String authToken, int gameID, ChessMove move) throws ResponseException {
+        try {
+            MakeMoveCommand moveCommand = new MakeMoveCommand(MAKE_MOVE, authToken, gameID, move);
+            this.session.getBasicRemote().sendText(new Gson().toJson(moveCommand));
+        } catch (IOException ex) {
+            throw new ResponseException(ex.getMessage());
+        }
+    }
+
+
+
 }

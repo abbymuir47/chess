@@ -14,6 +14,7 @@ import java.io.PrintStream;
 import java.nio.charset.StandardCharsets;
 import java.util.*;
 
+import static chess.ChessPiece.PieceType.*;
 import static ui.ChessBoard.ColorPerspective.*;
 import static ui.EscapeSequences.*;
 
@@ -186,10 +187,10 @@ public class Client implements ServerMessageObserver {
 
                     JoinRequest req = new JoinRequest(color, currId);
                     server.joinGame(req);
-                    drawCurrentBoard(id, currPerspective, null);
                     state = State.INGAME;
                     websocket = new WebSocketFacade(serverUrl, this);
                     currGameID = id;
+                    websocket.joinGame(currAuth, currGameID);
                     return ("Game " + id + " joined.");
                 }
                 throw new ResponseException("Game not found. Please list games and try again.");
@@ -212,24 +213,34 @@ public class Client implements ServerMessageObserver {
     }
 
     private String redraw(String[] params) throws ResponseException {
-        if(params.length == 0){
-            drawCurrentBoard(currGame.gameID(), currPerspective, null);
-            return "board redrawn";
-        }
-        throw new ResponseException("Expected: redraw");
+        drawCurrentBoard(currGame.gameID(), currPerspective, null);
+        return "board redrawn";
     }
 
     private String makeMove(String[] params) throws ResponseException {
-        if(params.length == 1){
+        if(params.length == 1 || params.length == 3){
             String req = params[0];
             int startRow = getRow(req.substring(0,2));
             int startCol = getCol(req.substring(0,2));
+            ChessPosition startPos = new ChessPosition(startRow, startCol);
             int endRow = getRow(req.substring(2,4));
             int endCol = getCol(req.substring(2,4));
-            return ("startRow " + startRow + " startCol: " + startCol + " endRow: " + endRow + " endCol: " + endCol);
-        }
-        else if(params.length == 3){
-            return "placeholder for when pawn promotion is included";
+            ChessPosition endPos = new ChessPosition(endRow, endCol);
+
+            ChessMove move;
+            if(params.length == 1){
+                move = new ChessMove(startPos, endPos, null);
+            }
+            else{
+                if(params[2].equals("Queen")){move = new ChessMove(startPos, endPos, QUEEN);}
+                else if(params[2].equals("Knight")){move = new ChessMove(startPos, endPos, KNIGHT);}
+                else if(params[2].equals("Rook")){move = new ChessMove(startPos, endPos, ROOK);}
+                else if(params[2].equals("Bishop")){move = new ChessMove(startPos, endPos, BISHOP);}
+                else{return "Please enter valid piece type";}
+            }
+
+            websocket.makeMove(currAuth, currGameID, move);
+            return ("move made");
         }
         throw new ResponseException("Expected: move <c1c2> -> <Queen>");
     }
@@ -257,7 +268,7 @@ public class Client implements ServerMessageObserver {
             }
             drawCurrentBoard(currGame.gameID(), currPerspective, positions);
 
-            return ("You highlighted moves for " + req + "\n" + "moves: " + moves);
+            return ("You highlighted moves for " + req + "\n");
         }
         throw new ResponseException("Expected form: highlight <a1>");
     }
@@ -295,20 +306,15 @@ public class Client implements ServerMessageObserver {
     }
 
     private String resign(String[] params) throws ResponseException {
-        return "resign";
+        websocket.resign(currAuth, currGameID);
+        return "you have now resigned, the game is over";
     }
 
     private String leaveGame(String[] params) throws ResponseException {
         assertSignedIn();
-        if(params.length == 0) {
-            websocket.leaveGame(currAuth, currGameID);
-            state = State.LOGGEDIN;
-        }
-        throw new ResponseException("Expected: leave");
-//        else {
-//            return "game left";
-//        }
-//        return "";
+        websocket.leaveGame(currAuth, currGameID);
+        state = State.LOGGEDIN;
+        return "game left successfully";
     }
 
     public String help() {
@@ -337,7 +343,7 @@ public class Client implements ServerMessageObserver {
             return """
                 Please select an option:
                 Redraw board: enter "redraw"
-                Make move: enter move in the form "move c1c2 -> Queen" where -> Queen is for pawn promotion and can be any piece
+                Make move: enter move in the form "move c1c2 -> Queen" where -> Queen is optional, for pawn promotion and can be any piece type
                 Highlight legal moves: enter "highlight c1"
                 Resign: enter "resign"
                 Leave game: "leave"
@@ -381,8 +387,6 @@ public class Client implements ServerMessageObserver {
         ServerMessage serverMessage =
                 gson.fromJson(message, ServerMessage.class);
 
-        System.out.println("in notify of client, message type: " + serverMessage.getServerMessageType());
-
         switch (serverMessage.getServerMessageType()) {
             case NOTIFICATION -> displayNotification(message);
             case ERROR -> displayError(message);
@@ -392,26 +396,24 @@ public class Client implements ServerMessageObserver {
 
     private void displayNotification(String message){
         NotificationMessage notificationMessage = gson.fromJson(message, NotificationMessage.class);
-        System.out.println("client-side, notification received: " + notificationMessage.getMessage());
+        System.out.println(notificationMessage.getMessage());
     }
     private void displayError(String message){
         ErrorMessage errorMessage = gson.fromJson(message, ErrorMessage.class);
-        System.out.println("client-side, error: " + errorMessage.getErrorMessage());
         out.print(SET_TEXT_COLOR_RED);
         out.println(errorMessage.getErrorMessage());
+        out.print(SET_TEXT_COLOR_GREEN);
     }
     private void loadGame(String message){
-        //call get and draw board with the passed in game
-        // will need to modify this so the perspective changes
-        System.out.println("client-side, load game message received");
         LoadGameMessage loadGameMessage = gson.fromJson(message, LoadGameMessage.class);
 
         if(loadGameMessage.getPlayerType().equals("white")){currPerspective = WHITE_PLAYER;}
         else if(loadGameMessage.getPlayerType().equals("black")){currPerspective = BLACK_PLAYER;}
         else{currPerspective = WHITE_PLAYER;}
 
+        //i know this doesn't make sense because it's not truly updating it but need to figure out how to do so
+        currGame = new GameData(currGameID, currGame.whiteUsername(), currGame.blackUsername(), currGame.gameName(), loadGameMessage.getGame());
         drawChessGame(currPerspective, null, loadGameMessage.getGame());
-        System.out.println("still in notify, board was drawn");
     }
 
 }
