@@ -152,7 +152,7 @@ public class WebSocketHandler {
         connections.broadcast(gameID, "", gameMessage);
 
         //send notification message to all others saying what move was made
-        String moveMessage = currTurnColor + " player " + username + " moved";
+        String moveMessage = currTurnColor + " player " + username + " moved from " + moveCommand.getStartPos() + " to " + moveCommand.getEndPos();
         NotificationMessage moveNotification = new NotificationMessage(NOTIFICATION, moveMessage);
         connections.broadcast(gameID, username, moveNotification);
 

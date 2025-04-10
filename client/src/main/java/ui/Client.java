@@ -223,9 +223,12 @@ public class Client implements ServerMessageObserver {
             int startRow = getRow(req.substring(0,2));
             int startCol = getCol(req.substring(0,2));
             ChessPosition startPos = new ChessPosition(startRow, startCol);
+            String start = req.substring(0,2);
+
             int endRow = getRow(req.substring(2,4));
             int endCol = getCol(req.substring(2,4));
             ChessPosition endPos = new ChessPosition(endRow, endCol);
+            String end = req.substring(2,4);
 
             ChessMove move;
             if(params.length == 1){
@@ -239,7 +242,7 @@ public class Client implements ServerMessageObserver {
                 else{return "Please enter valid piece type";}
             }
 
-            websocket.makeMove(currAuth, currGameID, move);
+            websocket.makeMove(currAuth, currGameID, move, start, end);
             return ("move made");
         }
         throw new ResponseException("Expected: move <c1c2> -> <Queen>");
@@ -311,7 +314,6 @@ public class Client implements ServerMessageObserver {
     }
 
     private String leaveGame(String[] params) throws ResponseException {
-        assertSignedIn();
         websocket.leaveGame(currAuth, currGameID);
         state = State.LOGGEDIN;
         return "game left successfully";
@@ -362,7 +364,7 @@ public class Client implements ServerMessageObserver {
 
     private void drawCurrentBoard(int id, ChessBoard.ColorPerspective perspective, int[][] highlights) throws ResponseException {
         try{
-            GameData currGame = gameMap.get(id);
+            //GameData currGame = gameMap.get(id);
             getAndDrawBoard(currGame, perspective, highlights);
         }
         catch(Exception e){
@@ -396,6 +398,7 @@ public class Client implements ServerMessageObserver {
 
     private void displayNotification(String message){
         NotificationMessage notificationMessage = gson.fromJson(message, NotificationMessage.class);
+        out.print(SET_TEXT_COLOR_BLUE);
         System.out.println(notificationMessage.getMessage());
     }
     private void displayError(String message){
