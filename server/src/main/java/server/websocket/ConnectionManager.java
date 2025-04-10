@@ -33,8 +33,6 @@ public class ConnectionManager {
                     connections.remove(gameID);
                 }
             }
-
-            connections.remove(gameID);
         }
 
         public void sendMessage(Session session, ServerMessage message) throws IOException {
@@ -44,17 +42,15 @@ public class ConnectionManager {
         }
 
         public void broadcast(int gameID, String excludeUsername, ServerMessage message) throws IOException {
-            System.out.println("in broadcast");
-
             if(!connections.containsKey(gameID)){
                 return;
             }
             else{
-                System.out.println("gameID connection found");
                 var gameConnections = connections.get(gameID);
+                System.out.println("in broadcast, going to exclude: " + excludeUsername);
                 for(var user: gameConnections.keySet()){
-                    System.out.println("user:" + user);
                     if(!user.equals(excludeUsername)){
+                        System.out.println("in broadcast, sending message to: " + user);
                         Session currSession = gameConnections.get(user);
                         sendMessage(currSession, message);
                     }

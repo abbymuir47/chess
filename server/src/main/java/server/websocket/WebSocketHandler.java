@@ -61,31 +61,70 @@ public class WebSocketHandler {
         }
         ChessGame game = gameData.game();
 
-        //if a user is a player:
-        if(isPlayer(username, gameData)){
+        //notify other users that a certain user joined the game
+        connections.add(command.getGameID(), username, session);
+
+        String playerType;
+        if(gameData.whiteUsername()!=null && gameData.whiteUsername().equals(username)){
+            playerType = "white";
+        } else if(gameData.blackUsername()!=null && gameData.blackUsername().equals(username)){
+            playerType = "black";
+        } else{
+            playerType = "observer";
+        }
+
+        String message = username + " joined game " + gameID + " as " + playerType;
+        NotificationMessage connectMessage = new NotificationMessage(NOTIFICATION, message);
+        connections.broadcast(gameID, username, connectMessage);
+
+        //send load game message back to the user
+        LoadGameMessage gameMessage = new LoadGameMessage(LOAD_GAME, game);
+        connections.sendMessage(session, gameMessage);
+        /*
+        int gameID = command.getGameID();
+        GameData gameData = sqlGameDataAccess.getGame(gameID);
+        if (gameData == null) {
+            connections.sendMessage(session, new ErrorMessage(ERROR, "Error: enter a valid game ID"));
+            return;
+        }
+        ChessGame game = gameData.game();
+
+        String playerType;
+        if(gameData.whiteUsername().equals(username)){
+            playerType = "white";
+        } else if(gameData.blackUsername().equals(username)){
+            playerType = "black";
+        } else{
+            playerType = "observer";
+        }
+
+        connections.add(gameID, username, session);
+        NotificationMessage connectMessage;
+
+        if(playerType.equals("white") || playerType.equals("black")){
+            System.out.println("in connect method, player detected");
             String joinMessage = username + " joined game " + gameID;
-            alertOtherUsers(session, username, command, joinMessage, gameID);
+            connectMessage = new NotificationMessage(NOTIFICATION, joinMessage);
 
             //send load game message back to the user
             LoadGameMessage gameMessage = new LoadGameMessage(LOAD_GAME, game);
             connections.sendMessage(session, gameMessage);
         }
         else{
+            System.out.println("in connect method, observer detected");
             String observeMessage = username + " is now observing game " + gameID;
-            alertOtherUsers(session, username, command, observeMessage, gameID);
+            connectMessage = new NotificationMessage(NOTIFICATION, observeMessage);
         }
-    }
-
-    private void alertOtherUsers(Session session, String username, UserGameCommand command, String message, int gameID) throws IOException {
-        connections.add(command.getGameID(), username, session);
-        NotificationMessage connectMessage = new NotificationMessage(NOTIFICATION, message);
+        System.out.println("about to broadcast, user being excluded: " + username);
         connections.broadcast(gameID, username, connectMessage);
+         */
     }
 
     private void makeMove(Session session, String username, String message){
         MakeMoveCommand moveCommand = gson.fromJson(message, MakeMoveCommand.class);
         ChessMove move = moveCommand.getChessMove();
     }
+
     private void leaveGame(Session session, String username, UserGameCommand command) throws DataAccessException, IOException {
         int gameID = command.getGameID();
         GameData originalGame = sqlGameDataAccess.getGame(gameID);
@@ -95,6 +134,21 @@ public class WebSocketHandler {
         }
 
         GameData updatedGame;
+        NotificationMessage leaveMessage = new NotificationMessage(NOTIFICATION, String.format("%s left the game", username));
+
+        if(originalGame.whiteUsername()!=null && originalGame.whiteUsername().equals(username)){
+            updatedGame = new GameData(originalGame.gameID(), null, originalGame.blackUsername(), originalGame.gameName(), originalGame.game());
+        } else if(originalGame.blackUsername()!=null && originalGame.blackUsername().equals(username)){
+            updatedGame = new GameData(originalGame.gameID(), originalGame.whiteUsername(), null, originalGame.gameName(), originalGame.game());
+        } else{
+            updatedGame = originalGame;
+        }
+
+        connections.broadcast(gameID, username, leaveMessage);
+        sqlGameDataAccess.updateGame(updatedGame);
+        connections.remove(gameID, username);
+
+        /*
         if(isPlayer(username, originalGame)){
             NotificationMessage leaveMessage = new NotificationMessage(NOTIFICATION, String.format("%s left the game", username));
             if(originalGame.whiteUsername()!=null && originalGame.whiteUsername().equals(username)){
@@ -113,9 +167,26 @@ public class WebSocketHandler {
                 connections.sendMessage(session, new ErrorMessage(ERROR, "Error: user not found in this game"));
             }
         }
+
+         */
     }
 
-    private void resign(Session session, String username, UserGameCommand command){}
+    private void resign(Session session, String username, UserGameCommand command) throws IOException, DataAccessException {
+        int gameID = command.getGameID();
+        GameData originalGame = sqlGameDataAccess.getGame(gameID);
+        if (originalGame == null) {
+            connections.sendMessage(session, new ErrorMessage(ERROR, "Error: enter a valid game ID"));
+            return;
+        }
+
+        if (isPlayer(username, originalGame)){
+            System.out.println("valid resign request received from a player");
+
+        }
+        else{
+            connections.sendMessage(session, new ErrorMessage(ERROR, "Error: observer cannot resign from a game"));
+        }
+    }
 
     private static boolean isPlayer(String username, GameData game) {
         if(game.whiteUsername()!=null && game.whiteUsername().equals(username)) {

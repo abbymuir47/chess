@@ -16,11 +16,13 @@ public class ChessGame {
 
     private ChessBoard board;
     private ChessGame.TeamColor team;
+    private boolean gameOver;
 
     public ChessGame() {
         board = new ChessBoard();
         board.resetBoard();
         team = TeamColor.WHITE;
+        gamePver
     }
 
     public ChessGame(ChessGame original) {
