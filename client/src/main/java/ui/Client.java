@@ -295,7 +295,7 @@ public class Client implements ServerMessageObserver {
     }
 
     private String leaveGame(String[] params) throws ResponseException {
-        return "leave game";
+        websocket.leaveGame
     }
 
     public String help() {
@@ -390,7 +390,12 @@ public class Client implements ServerMessageObserver {
         // will need to modify this so the perspective changes
         System.out.println("client-side, load game message received");
         LoadGameMessage loadGameMessage = gson.fromJson(message, LoadGameMessage.class);
-        drawChessGame(defaultPerspective, null, loadGameMessage.getGame());
+
+        if(loadGameMessage.getPlayerType().equals("white")){currPerspective = WHITE_PLAYER;}
+        else if(loadGameMessage.getPlayerType().equals("black")){currPerspective = BLACK_PLAYER;}
+        else{currPerspective = WHITE_PLAYER;}
+
+        drawChessGame(currPerspective, null, loadGameMessage.getGame());
         System.out.println("still in notify, board was drawn");
     }
 

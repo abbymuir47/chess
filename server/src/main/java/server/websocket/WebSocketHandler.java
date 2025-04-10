@@ -79,7 +79,7 @@ public class WebSocketHandler {
         connections.broadcast(gameID, username, connectMessage);
 
         //send load game message back to the user
-        LoadGameMessage gameMessage = new LoadGameMessage(LOAD_GAME, game);
+        LoadGameMessage gameMessage = new LoadGameMessage(LOAD_GAME, game, playerType);
         connections.sendMessage(session, gameMessage);
         System.out.println("just sent message");
     }
@@ -103,6 +103,7 @@ public class WebSocketHandler {
         ChessGame.TeamColor currTurnColor = game.getTeamTurn();
         ChessPosition startPos = move.getStartPosition();
         ChessPosition endPos = move.getEndPosition();
+        String playerType = "";
 
         //checks if current user is moving its own piece on its own turn
         if(currTurnColor == getPlayerColor(username, gameData)){
@@ -111,6 +112,8 @@ public class WebSocketHandler {
 
             if(startPiece.getTeamColor()== currTurnColor){
                 System.out.println("player is correctly requesting to move its own piece");
+                if(currTurnColor==WHITE){playerType="white";}
+                if(currTurnColor==BLACK){playerType="white";}
             }
             else{
                 connections.sendMessage(session, new ErrorMessage(ERROR, "Error: player cannot move a piece that's not its own"));
@@ -145,7 +148,7 @@ public class WebSocketHandler {
         sqlGameDataAccess.updateGame(gameWithMoveMade);
 
         //send load game message to all
-        LoadGameMessage gameMessage = new LoadGameMessage(LOAD_GAME, game);
+        LoadGameMessage gameMessage = new LoadGameMessage(LOAD_GAME, game, playerType);
         connections.broadcast(gameID, "", gameMessage);
 
         //send notification message to all others saying what move was made

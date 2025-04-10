@@ -66,4 +66,15 @@ public class WebSocketFacade extends Endpoint{
             throw new ResponseException(ex.getMessage());
         }
     }
+
+    public void leaveGame(String authToken, int gameID) throws ResponseException {
+        System.out.println("client-side, observe game request made");
+
+        try {
+            UserGameCommand observeCommand = new UserGameCommand(CONNECT, authToken, gameID);
+            this.session.getBasicRemote().sendText(new Gson().toJson(observeCommand));
+        } catch (IOException ex) {
+            throw new ResponseException(ex.getMessage());
+        }
+    }
 }
